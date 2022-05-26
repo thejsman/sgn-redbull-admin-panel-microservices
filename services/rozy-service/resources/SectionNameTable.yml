@@ -1,0 +1,15 @@
+SectionNameTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: sectionName
+        AttributeType: S
+      - AttributeName: sectionLanguage
+        AttributeType: S
+    KeySchema:
+      - AttributeName: sectionName
+        KeyType: HASH
+      - AttributeName: sectionLanguage
+        KeyType: RANGE
+    BillingMode: PAY_PER_REQUEST
+    TableName: ${self:custom.SectionNameTable}

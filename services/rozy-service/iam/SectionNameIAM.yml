@@ -1,0 +1,11 @@
+SectionNameIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:DeleteItem
+    - dynamodb:Scan
+  Resource:
+    - Fn::GetAtt: [SectionNameTable, Arn]
