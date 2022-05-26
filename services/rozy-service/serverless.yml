@@ -1,0 +1,87 @@
+service: rozy-service
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  environment:
+    SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
+  iam:
+    role:
+      statements:
+        - ${file(iam/SectionNameIAM.yml):SectionNameIAM}
+resources:
+  Resources:
+    SectionNameTable: ${file(resources/SectionNameTable.yml):SectionNameTable}
+functions:
+  addRozy:
+    handler: src/handlers/AddRozy.handler
+    events:
+      - http:
+          method: POST
+          path: /rozy
+          cors: true
+  getRozy:
+    handler: src/handlers/GetRozy.handler
+    events:
+      - http:
+          method: GET
+          path: /rozy
+          cors: true
+  updateRozy:
+    handler: src/handlers/UpdateRozy.handler
+    events:
+      - http:
+          method: PATCH
+          path: /rozy
+          cors: true
+  deleteRozy:
+    handler: src/handlers/DeleteRozy.handler
+    events:
+      - http:
+          method: DELETE
+          path: /rozy
+          cors: true
+  listRozy:
+    handler: src/handlers/ListRozy.handler
+    events:
+      - http:
+          method: GET
+          path: /listrozy
+          cors: true
+  listFaqs:
+    handler: src/handlers/ListFaqs.handler
+    events:
+      - http:
+          method: GET
+          path: /listfaqs
+          cors: true
+
+  getOnboarding:
+    handler: src/handlers/GetOnboarding.handler
+    events:
+      - http:
+          method: GET
+          path: /onboarding
+          cors: true
+
+custom:
+  SectionNameTable: "SectionNameTable-${sls:stage}"
+  domains:
+    prod: api.sagoonlite.com
+    dev: dev.sagoonlite.com
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    basePath: "rozy"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    # certificateName: "*.sagoon.com"
+    endpointType: "edge"
