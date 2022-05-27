@@ -1,0 +1,26 @@
+OccasionIconTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: occasionIdentifier
+        AttributeType: S
+      - AttributeName: occasionName
+        AttributeType: S
+      - AttributeName: displayOrder
+        AttributeType: N
+    KeySchema:
+      - AttributeName: occasionIdentifier
+        KeyType: HASH
+      - AttributeName: occasionName
+        KeyType: RANGE
+    LocalSecondaryIndexes:
+      - IndexName: occasion_order-Index
+        KeySchema:
+          - AttributeName: occasionIdentifier
+            KeyType: HASH
+          - AttributeName: displayOrder
+            KeyType: RANGE
+        Projection:
+          ProjectionType: "ALL"
+    BillingMode: PAY_PER_REQUEST
+    TableName: ${self:custom.OccasionIconTable}

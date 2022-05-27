@@ -1,0 +1,66 @@
+service: admin-homescreen-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  environment:
+    OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
+  iam:
+    role:
+      statements:
+        - ${file(iam/OccasionCardIAM.yml):OccasionCardIAM}
+        - ${file(iam/UploadS3IAM.yml):UploadS3IAM}
+        - Effect: Allow
+          Action:
+            - "lambda:InvokeAsync"
+            - "lambda:InvokeFunction"
+          Resource: "*"
+
+functions:
+  createOccasionCard:
+    handler: src/handlers/CreateOccasionCard.handler
+    events:
+      - http:
+          method: POST
+          path: /create-card
+          cors: true
+  deleteOccasionCard:
+    handler: src/handlers/DeleteOccasionCard.handler
+    events:
+      - http:
+          method: DELETE
+          path: /delete-card
+          cors: true
+  getOccasionCard:
+    handler: src/handlers/GetOccasionCard.handler
+    events:
+      - http:
+          method: GET
+          path: /card/{cardGroup}/{cardName}
+          cors: true
+  getOccasionCards:
+    handler: src/handlers/GetOccasionCards.handler
+    events:
+      - http:
+          method: GET
+          path: /cards/{occasionName}
+          cors: true
+custom:
+  OccasionCardTable: "OccasionCardTable-${sls:stage}"
+  domains:
+    prod: api.sagoonlite.com
+    dev: dev.sagoonlite.com
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    basePath: "homescreen"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: "edge"

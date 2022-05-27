@@ -1,0 +1,15 @@
+NotificationTemplateTableIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:Query
+    - dynamodb:DeleteItem
+    - dynamodb:Scan
+    - dynamodb:BatchWriteItem
+
+  Resource: 
+    - Fn::GetAtt: [NotificationTemplateTable, Arn]
+    - Fn::Join: ["/", ["Fn::GetAtt": [NotificationTemplateTable, Arn], "index", "*"]]

@@ -1,0 +1,107 @@
+service: admin-occasion-service
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  environment:
+    OCCASION_ICON_TABLE: ${self:custom.OccasionIconTable}
+    OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
+    OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
+  iam:
+    role:
+      statements:
+        - ${file(iam/OccasionIconIAM.yml):OccasionIconIAM}
+        - ${file(iam/OccasionTemplatesIAM.yml):OccasionTemplatesIAM}
+        - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
+        - Effect: Allow
+          Action:
+            - "lambda:InvokeAsync"
+            - "lambda:InvokeFunction"
+          Resource: "*"
+
+functions:
+  getOccasions:
+    handler: src/handlers/GetOccasions.handler
+    events:
+      - http:
+          method: GET
+          path: /occasion
+          cors: true
+  AddOccasion:
+    handler: src/handlers/AddOccasion.handler
+    events:
+      - http:
+          method: PATCH
+          path: /occasion
+          cors: true
+  GetOccasionByName:
+    handler: src/handlers/GetOccasionByName.handler
+    events:
+      - http:
+          method: GET
+          path: /occasion/{occasionName}
+          cors: true
+  DeleteOccasion:
+    handler: src/handlers/DeleteOccasion.handler
+    events:
+      - http:
+          method: DELETE
+          path: /occasion/{occasionName}
+          cors: true
+  getTemplates:
+    handler: src/handlers/GetTemplates.handler
+    events:
+      - http:
+          method: GET
+          path: /templates
+          cors: true
+  addTemplate:
+    handler: src/handlers/AddTemplate.handler
+    events:
+      - http:
+          method: POST
+          path: /template
+          cors: true
+  getTemplateByName:
+    handler: src/handlers/GetTemplateByName.handler
+    events:
+      - http:
+          method: GET
+          path: /template/{occasionName}/{templateName}
+          cors: true
+  deleteTemplate:
+    handler: src/handlers/DeleteTemplate.handler
+    events:
+      - http:
+          method: DELETE
+          path: /template/{occasionName}/{templateName}
+          cors: true
+  getTemplatesByOccasion:
+    handler: src/handlers/GetTemplatesByOccasion.handler
+    events:
+      - http:
+          method: GET
+          path: /templates/{templateName}
+          cors: true
+custom:
+  OccasionIconTable: "OccasionIconTable-${sls:stage}"
+  OccasionTemplatesTable: "OccasionTemplatesTable-${sls:stage}"
+  OccasionCardTable: "OccasionCardsTable-${sls:stage}"
+
+  domains:
+    prod: api.sagoonlite.com
+    dev: dev.sagoonlite.com
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    basePath: "occasions"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: "edge"

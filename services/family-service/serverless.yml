@@ -1,0 +1,72 @@
+service: admin-family-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  environment:
+    ACCESS_KEY_ID: ${env:ACCESS_KEY_ID}
+    SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
+    REGION: ${env:REGION}
+    RELATIONSHIP_TABLE_NAME: RelationshipTable-${sls:stage}
+
+  iamRoleStatements:
+    - ${file(iam/RelationshipTableIAM.yml):RelationshipTableIAM}
+    - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+
+functions:
+  getOneRelationship:
+    handler: src/handlers/getOne.handler
+    events:
+      - http:
+          method: GET
+          path: /releationship/getOne
+          cors: true
+  createRelationship:
+    handler: src/handlers/create.handler
+    events:
+      - http:
+          method: POST
+          path: /releationship/create
+          cors: true
+  updateRelationship:
+    handler: src/handlers/update.handler
+    events:
+      - http:
+          method: PUT
+          path: /releationship/update
+          cors: true
+  deleteRelationship:
+    handler: src/handlers/delete.handler
+    events:
+      - http:
+          method: DELETE
+          path: /releationship/delete
+          cors: true
+  queryRelationship:
+    handler: src/handlers/query.handler
+    events:
+      - http:
+          method: GET
+          path: /releationship/query
+          cors: true
+custom:
+  RelationshipTableName: RelationshipTable-${sls:stage}
+
+  domains:
+    prod: api.sagoonlite.com
+    dev: dev.sagoonlite.com
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    basePath: "familyAdmin"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: "edge"

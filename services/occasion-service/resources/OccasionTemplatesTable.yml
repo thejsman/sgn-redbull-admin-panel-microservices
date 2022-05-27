@@ -1,0 +1,26 @@
+OccasionTemplatesTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: occasionName
+        AttributeType: S
+      - AttributeName: templateName
+        AttributeType: S
+      - AttributeName: displayOrder
+        AttributeType: N
+    KeySchema:
+      - AttributeName: occasionName
+        KeyType: HASH
+      - AttributeName: templateName
+        KeyType: RANGE
+    LocalSecondaryIndexes:
+      - IndexName: template_order-Index
+        KeySchema:
+          - AttributeName: occasionName
+            KeyType: HASH
+          - AttributeName: displayOrder
+            KeyType: RANGE
+        Projection:
+          ProjectionType: "ALL"
+    BillingMode: PAY_PER_REQUEST
+    TableName: ${self:custom.OccasionTemplatesTable}

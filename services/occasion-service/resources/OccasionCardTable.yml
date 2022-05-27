@@ -1,0 +1,15 @@
+OccasionCardTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: cardName
+        AttributeType: S
+      - AttributeName: subCardName
+        AttributeType: S
+    KeySchema:
+      - AttributeName: cardName
+        KeyType: HASH
+      - AttributeName: subCardName
+        KeyType: RANGE
+    BillingMode: PAY_PER_REQUEST
+    TableName: ${self:custom.OccasionCardTable}
