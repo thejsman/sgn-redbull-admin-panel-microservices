@@ -1,0 +1,76 @@
+service: admin-voucher-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  environment:
+    VOUCHER_TABLE_NAME: VoucherTable-${sls:stage}
+
+  iamRoleStatements:
+    - ${file(iam/VoucherTableIAM.yml):VoucherTableIAM}
+
+resources:
+  Resources:
+    VoucherTable: ${file(resources/VoucherTable.yml):VoucherTable}
+
+functions:
+  createVoucher:
+    handler: src/handlers/createVoucher.handler
+    events:
+      - http:
+          method: POST
+          path: /create
+          cors: true
+  updateVoucher:
+    handler: src/handlers/updateVoucher.handler
+    events:
+      - http:
+          method: PATCH
+          path: /update
+          cors: true
+  voucherList:
+    handler: src/handlers/vouchersList.handler
+    events:
+      - http:
+          method: GET
+          path: /list
+          cors: true
+  getVoucher:
+    handler: src/handlers/getVoucher.handler
+    events:
+      - http:
+          method: GET
+          path: /get
+          cors: true
+  getVoucherById:
+    handler: src/handlers/getVoucherByVoucherId.handler
+    events:
+      - http:
+          method: GET
+          path: /getById
+          cors: true
+custom:
+  VoucherTableName: VoucherTable-${sls:stage}
+
+  domains:
+    prod: api.sagoonlite.com
+    dev: dev.sagoonlite.com
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: "adminVoucher"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: "edge"
+  authorizer:
+    name: VerifyTokenARN
+    arn:
+      Fn::ImportValue: VerifyTokenARN

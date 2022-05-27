@@ -1,0 +1,13 @@
+{
+	"name": "admin-occasion-service",
+	"version": "1.0.0",
+	"description": "Backend APIs for public website",
+	"author": "NB",
+	"license": "MIT",
+	"devDependencies": {
+		"serverless-bundle": "^5.3.0"
+	},
+	"dependencies": {
+		"serverless-domain-manager": "^6.0.2"
+	}
+}

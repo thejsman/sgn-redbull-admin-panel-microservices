@@ -1,0 +1,15 @@
+OccasionIconIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:DeleteItem
+    - dynamodb:Scan
+
+  Resource:
+    [
+      "arn:aws:dynamodb:eu-central-1:929042302465:table/OccasionIconTable-dev",
+      "arn:aws:dynamodb:eu-central-1:929042302465:table/OccasionIconTable-dev/index/occasion_order-Index",
+    ]

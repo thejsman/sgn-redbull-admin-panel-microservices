@@ -1,0 +1,83 @@
+service: admin-notification-service
+
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 2048
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-central-1'}
+  environment:
+    NOTIFICATION_TEMPLATE_TABLE: ${self:custom.NotificationTemplateTable}
+    ACCESS_KEY: ${self:custom.settings.accessKeyId}
+    SECRET_KEY: ${self:custom.settings.secretAccessKey}
+    PLATFORM_APPLICATION_ARN: ${self:custom.settings.PlatformApplicationArn}
+
+  iamRoleStatements:
+    - ${file(iam/NotificationTemplateTableIAM.yml):NotificationTemplateTableIAM}
+    - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+
+resources:
+  Resources:
+    NotificationTemplateTable: ${file(resources/NotificationTemplate.yml):NotificationTemplateTable}
+
+functions:
+  savetemplate:
+    handler: src/handlers/notificationTemplates/create.handler
+    events:
+      - http:
+          path: /notification-saveTemplate
+          method: POST
+          cors: true
+  updateTemplate:
+    handler: src/handlers/notificationTemplates/update.handler
+    events:
+      - http:
+          path: /notification-update
+          method: put
+          cors: true
+  deleteTemplate:
+    handler: src/handlers/notificationTemplates/delete.handler
+    events:
+      - http:
+          path: /notification-delete
+          method: delete
+          cors: true
+  listTemplate:
+    handler: src/handlers/notificationTemplates/list.handler
+    events:
+      - http:
+          path: /notification-list
+          method: get
+          cors: true
+  singleTemplate:
+    handler: src/handlers/notificationTemplates/getOne.handler
+    events:
+      - http:
+          path: /notification-single
+          method: get
+          cors: true
+
+custom:
+  NotificationTemplateTable: "NotificationTemplateTable-${sls:stage}"
+  myStage: ${opt:stage, self:provider.stage}
+  settings: ${file(./${opt:stage, 'dev'}.json):CREDS}
+
+  domains:
+    prod: api.sagoonlite.com
+    dev: dev.sagoonlite.com
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    basePath: "templateAdmin"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: "edge"
+  authorizer:
+    name: VerifyTokenARN
+    arn:
+      Fn::ImportValue: VerifyTokenARN
