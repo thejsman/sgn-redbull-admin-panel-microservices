@@ -1,6 +1,6 @@
 import { responseHandler } from "../lib/response";
-import commonMiddleware from "../lib/commonMiddleware";
-import {getVoucherByVoucherId} from "../lib/voucherHelper";
+import commonMiddleware from "common-middleware";
+import { getVoucherByVoucherId } from "../lib/voucherHelper";
 
 const getVoucherById = async (event, context) => {
 	try {
@@ -25,5 +25,3 @@ const getVoucherById = async (event, context) => {
 };
 
 export const handler = commonMiddleware(getVoucherById);
-
-

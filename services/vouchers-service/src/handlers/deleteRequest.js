@@ -1,15 +1,15 @@
 /*eslint new-cap: ["error", { "newIsCap": false }]*/
-import commonMiddleware from "../lib/commonMiddleware";
+import commonMiddleware from "common-middleware";
 const AWS = require("aws-sdk");
 const { responseHandler } = require("../lib/response");
-import {getUserFromToken} from "../lib/userHelper";
+import { getUserFromToken } from "../lib/userHelper";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const updateConnection = async (event, context) => {
 	// const timestamp = new Date().getTime();
 
 	const { user } = await getUserFromToken(event.headers.Authorization);
 
-	console.log(user,"yyyyyy",user.userId);
+	console.log(user, "yyyyyy", user.userId);
 	if (!user) {
 		return {
 			statusCode: 401,
