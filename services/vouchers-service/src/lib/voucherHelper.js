@@ -19,7 +19,6 @@ export const createVoucher = async (voucher) => {
 };
 
 export const voucherList = async (data) => {
-	console.log("data", data);
 	let params = {
 		TableName: process.env.VOUCHER_TABLE_NAME,
 		Limit: +data.limit,

@@ -60,6 +60,11 @@ functions:
           method: GET
           path: /voucher/getById
           cors: true
+  processPendingVouchers:
+    handler: src/handlers/processPendingVouchers.handler
+    events:
+      - schedule: rate(3 hours)
+
 custom:
   VoucherTableName: VoucherTable-${sls:stage}
 
@@ -72,7 +77,7 @@ custom:
   region:
     dev: eu-central-1
     testing: ap-southeast-1
-    staging: ap-south-1
+    staging: ap-southeast-1
     prod: ap-south-1
 
   customDomain:
