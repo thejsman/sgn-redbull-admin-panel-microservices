@@ -13,6 +13,10 @@ VoucherTable:
         AttributeType: S
       - AttributeName: validTill
         AttributeType: N
+      - AttributeName: updatedDate
+        AttributeType: S
+      - AttributeName: updatedAt
+        AttributeType: S
     KeySchema:
       - AttributeName: pk
         KeyType: HASH
@@ -53,6 +57,14 @@ VoucherTable:
           - AttributeName: pk
             KeyType: HASH
           - AttributeName: status
+            KeyType: RANGE
+        Projection:
+          ProjectionType: "ALL"
+      - IndexName: updatedDate_updatedAt-Index
+        KeySchema:
+          - AttributeName: updatedDate
+            KeyType: HASH
+          - AttributeName: updatedAt
             KeyType: RANGE
         Projection:
           ProjectionType: "ALL"

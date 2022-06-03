@@ -1,6 +1,6 @@
 export const responseHandler = ({ statusCode, message, data }) => {
 	return {
-		statusCode: statusCode,
+		statusCode,
 		headers: {
 			"Access-Control-Allow-Origin": "*",
 			"Access-Control-Allow-Credentials": true,
