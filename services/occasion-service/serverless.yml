@@ -131,20 +131,20 @@ custom:
 
   domains:
     dev: dev.sagoonlite.com
-    testing: testing.sagoonlite.com
+    testing: testing.sagoon.com
     staging: staging.sagoon.com
     prod: api.sagoon.com
 
   region:
     dev: eu-central-1
     testing: ap-southeast-1
-    staging: ap-south-1
+    staging: ap-southeast-1
     prod: ap-south-1
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: "admin"
+    basePath: admin
     stage: ${sls:stage}
     createRoute53Record: true
-    endpointType: "edge"
+    endpointType: edge
