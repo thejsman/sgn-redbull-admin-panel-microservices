@@ -4,7 +4,6 @@ frameworkVersion: "3"
 plugins:
   - serverless-bundle
   - serverless-domain-manager
-
 provider:
   name: aws
   runtime: nodejs14.x
@@ -15,8 +14,7 @@ provider:
     OCCASION_ICON_TABLE: ${self:custom.OccasionIconTable}
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
-    S3BUCKET_REGION: ${self:custom.S3BucketRegion}
-    OCCASION_ICON_FOLDER: ${self:custom.S3Bucket}/occasion-icons
+    OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/admin/occasion-icons
   iam:
     role:
       statements:
@@ -127,7 +125,6 @@ custom:
   OccasionTemplatesTable: "OccasionTemplatesTable-${sls:stage}"
   OccasionCardTable: "OccasionCardsTable-${sls:stage}"
   S3Bucket: "sagoon-2022-dev"
-  S3BucketRegion: "eu-central-1"
 
   domains:
     dev: dev.sagoonlite.com
@@ -141,10 +138,16 @@ custom:
     staging: ap-southeast-1
     prod: ap-south-1
 
+  bucket:
+    dev: sagoon-2022-dev
+    testing: sagoon-staging
+    staging: sagoon-staging
+    prod: sagoon-staging
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: admin
+    basePath: occasion
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge
