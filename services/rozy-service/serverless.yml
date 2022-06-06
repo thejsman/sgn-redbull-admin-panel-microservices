@@ -11,7 +11,8 @@ provider:
   runtime: nodejs14.x
   memorySize: 256
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'eu-central-1'}
+  region: ${self:custom.region.${sls:stage}}
+
   environment:
     SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
   iam:
@@ -76,12 +77,20 @@ functions:
 custom:
   SectionNameTable: "SectionNameTable-${sls:stage}"
   domains:
-    prod: api.sagoonlite.com
     dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: api.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
-    basePath: "rozy"
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: rozy
     stage: ${sls:stage}
     createRoute53Record: true
-    # certificateName: "*.sagoon.com"
-    endpointType: "edge"
+    endpointType: edge
