@@ -3,12 +3,12 @@
 import AWS from 'aws-sdk';
 import { responseHandler } from "../lib/response";
 
-//  var s3 = new AWS.S3({
-//     accessKeyId:process.env.ACCESS_KEY_ID,
-//     secretAccessKey: process.env.SECRET_ACCESS_KEY,
-//     region: process.env.REGION,
-//   });
-var s3 = new AWS.S3({});
+ var s3 = new AWS.S3({
+    accessKeyId:process.env.ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY,
+    region: process.env.REGION,
+  });
+// var s3 = new AWS.S3({});
 
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
