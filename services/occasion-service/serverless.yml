@@ -147,7 +147,7 @@ custom:
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: admin
+    basePath: occasion
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge
