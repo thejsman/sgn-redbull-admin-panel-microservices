@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid";
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3({
-  region: "eu-central-1",
+  region: process.env.S3BUCKET_REGION,
 });
 
 async function AddOccasion(event, context) {
@@ -24,7 +24,7 @@ async function AddOccasion(event, context) {
         "base64"
       );
       var s3Params = {
-        Bucket: "sagoon-2022-dev/occasion-icons",
+        Bucket: process.env.OCCASION_ICON_FOLDER,
         Key: `${fileName[0]}-${uuid()}.${fileName[1]}`,
         Body: base64Data,
         ContentEncoding: "base64",
@@ -50,7 +50,7 @@ async function AddOccasion(event, context) {
     });
     await dynamoDb
       .update({
-        TableName: "OccasionIconTable-dev",
+        TableName: process.env.OCCASION_ICON_TABLE,
         Key: {
           occasionIdentifier: occasionIdentifier,
           occasionName: occasionName,

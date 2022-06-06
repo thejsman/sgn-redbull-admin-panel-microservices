@@ -9,7 +9,5 @@ OccasionIconIAM:
     - dynamodb:Scan
 
   Resource:
-    [
-      "arn:aws:dynamodb:eu-central-1:929042302465:table/OccasionIconTable-dev",
-      "arn:aws:dynamodb:eu-central-1:929042302465:table/OccasionIconTable-dev/index/occasion_order-Index",
-    ]
+    - Fn::GetAtt: [OccasionIconTable, Arn]
+    - Fn::Join: ["/", ["Fn::GetAtt": [OccasionIconTable, Arn], "index", "*"]]

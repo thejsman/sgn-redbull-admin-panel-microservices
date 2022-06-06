@@ -7,13 +7,13 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 async function GetOccasionCard(event, context) {
   try {
-    const { cardGroup, cardName } = event.pathParameters;
+    const { cardGroup, cardName } = event.pathParameters; //cardGroup later will be cardIdentifier,not done beacuse sls remove
     let result = await dynamoDb
       .get({
         TableName: process.env.OCCASION_CARD_TABLE,
         Key: {
-          cardName: cardGroup,
-          subCardName: cardName,
+          cardIdentifier: cardGroup,
+          cardName,
         },
       })
       .promise();
