@@ -11,12 +11,14 @@ provider:
   runtime: nodejs14.x
   memorySize: 256
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'eu-central-1'}
+  region: ${self:custom.region.${sls:stage}}
+
   environment:
     ACCESS_KEY_ID: ${env:ACCESS_KEY_ID}
     SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
-    REGION: ${env:REGION}
+    REGION: ${self:provider.region}
     RELATIONSHIP_TABLE_NAME: RelationshipTable-${sls:stage}
+    S3_BUCKET_NAME : ${self:custom.s3BucketName.${sls:stage}}
 
   iamRoleStatements:
     - ${file(iam/RelationshipTableIAM.yml):RelationshipTableIAM}
@@ -61,12 +63,28 @@ functions:
 custom:
   RelationshipTableName: RelationshipTable-${sls:stage}
 
+
+  s3BucketName:
+    dev: sagoon-relationship-dev
+    staging: sagoon-staging
+
   domains:
-    prod: api.sagoonlite.com
     dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: api.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
-    basePath: "familyAdmin"
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: familyAdmin
     stage: ${sls:stage}
     createRoute53Record: true
-    endpointType: "edge"
+    endpointType: edge
+

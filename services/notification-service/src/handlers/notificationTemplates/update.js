@@ -3,10 +3,11 @@ const AWS = require('aws-sdk');
 const { responseHandler } = require('../../lib/response');
 
 var s3 = new AWS.S3({
-  accessKeyId: 'AKIAQBCQH5WZD5K5YBMB',
-  secretAccessKey: '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',
-  region: 'eu-central-1'
+  accessKeyId: process.env.ACCESS_KEY,
+  secretAccessKey: process.env.SECRET_KEY,
+  region: process.env.REGION,
 });
+
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const updateTemplate = async (event, context) => {
@@ -24,7 +25,7 @@ const updateTemplate = async (event, context) => {
     );
 
     var s3Params = {
-      Bucket: 'sagoon-dev',
+      Bucket: process.env.S3_BUCKET_NAME,
       Key: data.fileName,
       Body: base64Data,
       ContentEncoding: 'base64',
