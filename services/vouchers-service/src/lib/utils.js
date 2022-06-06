@@ -4,7 +4,7 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 export const getPendingVouchers = async () => {
 	var d1 = new Date();
 	var d2 = new Date(d1);
-	d2.setMinutes(d1.getMinutes() - 5);
+	d2.setMinutes(d1.getMinutes() - process.env.PENDING_VOUCHER_TIME);
 
 	const params = {
 		TableName: process.env.VOUCHER_TABLE_NAME,

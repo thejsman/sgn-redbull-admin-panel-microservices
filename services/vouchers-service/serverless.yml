@@ -14,6 +14,7 @@ provider:
 
   environment:
     VOUCHER_TABLE_NAME: VoucherTable-${sls:stage}
+    PENDING_VOUCHER_TIME: ${self:custom.pendingVoucherTime.${sls:stage}}
 
   iam:
     role:
@@ -63,15 +64,15 @@ functions:
   processPendingVouchers:
     handler: src/handlers/processPendingVouchers.handler
     events:
-      - schedule: rate(3 hours)
+      - schedule: rate(${self:custom.cronTime.${sls:stage}})
 
 custom:
   VoucherTableName: VoucherTable-${sls:stage}
 
   domains:
     dev: dev.sagoonlite.com
-    testing: testing.sagoonlite.com
-    staging: staging.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
     prod: api.sagoon.com
 
   region:
@@ -80,15 +81,20 @@ custom:
     staging: ap-southeast-1
     prod: ap-south-1
 
+  pendingVoucherTime:
+    dev: 90
+    staging: 90
+    prod: 5
+
+  cronTime:
+    dev: 3 hours
+    staging: 3 hours
+    prod: 5 minute
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: "admin"
+    basePath: admin
     stage: ${sls:stage}
     createRoute53Record: true
-    endpointType: "edge"
-
-  authorizer:
-    name: VerifyTokenARN
-    arn:
-      Fn::ImportValue: VerifyTokenARN
+    endpointType: edge
