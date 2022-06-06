@@ -1,7 +1,0 @@
-{
-    "CREDS": {
-        "accessKeyId": "AKIAQBCQH5WZD5K5YBMB",
-        "secretAccessKey" : "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",
-         "PlatformApplicationArn":"arn:aws:sns:eu-central-1:002315775410:app/GCM/snspushdemo"
-    }
-}

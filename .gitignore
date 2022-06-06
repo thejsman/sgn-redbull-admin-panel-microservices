@@ -38,6 +38,8 @@ Thumbs.db
 .webpack
 .env
 .serverless
+env.json
+
 
 # Applications
 *.app
