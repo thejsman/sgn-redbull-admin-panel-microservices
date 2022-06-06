@@ -1,4 +1,5 @@
 service: admin-occasion-service
+useDotenv: true
 frameworkVersion: "3"
 
 plugins:
@@ -15,6 +16,8 @@ provider:
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
     OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/admin/occasion-icons
+    CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
+
   iam:
     role:
       statements:
