@@ -10,24 +10,55 @@ provider:
   runtime: nodejs14.x
   memorySize: 256
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'eu-central-1'}
+  region: ${self:custom.region.${sls:stage}}
   environment:
     OCCASION_ICON_TABLE: ${self:custom.OccasionIconTable}
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
+    S3BUCKET_REGION: ${self:custom.S3BucketRegion}
+    OCCASION_ICON_FOLDER: ${self:custom.S3Bucket}/occasion-icons
   iam:
     role:
       statements:
+        - ${file(iam/OccasionCardIAM.yml):OccasionCardIAM}
         - ${file(iam/OccasionIconIAM.yml):OccasionIconIAM}
         - ${file(iam/OccasionTemplatesIAM.yml):OccasionTemplatesIAM}
         - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
-        - Effect: Allow
-          Action:
-            - "lambda:InvokeAsync"
-            - "lambda:InvokeFunction"
-          Resource: "*"
+resources:
+  Resources:
+    OccasionCardTable: ${file(resources/OccasionCardTable.yml):OccasionCardTable}
+    OccasionIconTable: ${file(resources/OccasionIconTable.yml):OccasionIconTable}
+    OccasionTemplatesTable: ${file(resources/OccasionTemplatesTable.yml):OccasionTemplatesTable}
 
 functions:
+  createOccasionCard:
+    handler: src/handlers/CreateOccasionCard.handler
+    events:
+      - http:
+          method: POST
+          path: /create-card
+          cors: true
+  deleteOccasionCard:
+    handler: src/handlers/DeleteOccasionCard.handler
+    events:
+      - http:
+          method: DELETE
+          path: /delete-card
+          cors: true
+  getOccasionCard:
+    handler: src/handlers/GetOccasionCard.handler
+    events:
+      - http:
+          method: GET
+          path: /card/{cardGroup}/{cardName}
+          cors: true
+  getOccasionCards:
+    handler: src/handlers/GetOccasionCards.handler
+    events:
+      - http:
+          method: GET
+          path: /cards/{occasionName}
+          cors: true
   getOccasions:
     handler: src/handlers/GetOccasions.handler
     events:
@@ -95,13 +126,25 @@ custom:
   OccasionIconTable: "OccasionIconTable-${sls:stage}"
   OccasionTemplatesTable: "OccasionTemplatesTable-${sls:stage}"
   OccasionCardTable: "OccasionCardsTable-${sls:stage}"
+  S3Bucket: "sagoon-2022-dev"
+  S3BucketRegion: "eu-central-1"
 
   domains:
-    prod: api.sagoonlite.com
     dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: api.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
-    basePath: "occasions"
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: admin
     stage: ${sls:stage}
     createRoute53Record: true
-    endpointType: "edge"
+    endpointType: edge

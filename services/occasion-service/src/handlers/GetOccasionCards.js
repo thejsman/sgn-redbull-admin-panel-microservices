@@ -6,15 +6,20 @@ import createError from "http-errors";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 async function GetOccasionCards(event, context) {
-  let occasionName = event.pathParameters.occasionName;
+  let cardIdentifier = event.pathParameters.occasionName; // latter occasionName => cardIdentifier
 
   try {
     const params = {
       TableName: process.env.OCCASION_CARD_TABLE,
-      FilterExpression: "occasionName = :occasionName",
-      ExpressionAttributeValues: { ":occasionName": occasionName },
+      KeyConditionExpression: "#cardIdentifier = :cardIdentifier",
+      ExpressionAttributeNames: {
+        "#cardIdentifier": "cardIdentifier",
+      },
+      ExpressionAttributeValues: {
+        ":cardIdentifier": cardIdentifier,
+      },
     };
-    let result = await dynamoDb.scan(params).promise();
+    let result = await dynamoDb.query(params).promise();
     if (result.Items.length > 0) {
       return response(200, { cardList: result.Items });
     } else {

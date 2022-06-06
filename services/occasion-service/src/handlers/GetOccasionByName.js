@@ -10,7 +10,7 @@ async function GetOccasionByName(event, context) {
   let occasionName = event.pathParameters.occasionName;
   try {
     const params = {
-      TableName: "OccasionIconTable-dev",
+      TableName: process.env.OCCASION_ICON_TABLE,
       Key: {
         occasionIdentifier: "occasion",
         occasionName: occasionName,

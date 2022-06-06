@@ -9,7 +9,6 @@ OccasionTemplatesIAM:
     - dynamodb:Scan
 
   Resource:
-    [
-      "arn:aws:dynamodb:eu-central-1:929042302465:table/OccasionTemplatesTable-dev",
-      "arn:aws:dynamodb:eu-central-1:929042302465:table/OccasionTemplatesTable-dev/index/template_order-Index",
-    ]
+    - Fn::GetAtt: [OccasionTemplatesTable, Arn]
+    - Fn::Join:
+        ["/", ["Fn::GetAtt": [OccasionTemplatesTable, Arn], "index", "*"]]
