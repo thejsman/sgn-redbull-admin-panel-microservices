@@ -4,12 +4,11 @@ const AWS = require('aws-sdk');
 const { responseHandler } = require('../../lib/response');
 
 
- var s3 = new AWS.S3({
-    accessKeyId: "AKIAQBCQH5WZD5K5YBMB",
-    secretAccessKey: "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",
-    region: "eu-central-1",
-  });
-
+var s3 = new AWS.S3({
+  accessKeyId: process.env.ACCESS_KEY,
+  secretAccessKey: process.env.SECRET_KEY,
+  region: process.env.REGION,
+});
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const createTemplate = async (event, context) => {
@@ -35,22 +34,22 @@ const createTemplate = async (event, context) => {
     }
   };
 
-  if(data.base64){
+  if (data.base64) {
     const type = data.base64.split(';')[0].split('/')[1];
-    const base64Data =new Buffer.from(data.base64.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+    const base64Data = new Buffer.from(data.base64.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 
-  var s3Params = {
-    Bucket: "sagoon-dev",
-    Key: data.fileName,
-    Body: base64Data,
-    ContentEncoding: 'base64',
-    ContentType: type,
-    ACL: "public-read"
-  };
+    var s3Params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: data.fileName,
+      Body: base64Data,
+      ContentEncoding: 'base64',
+      ContentType: type,
+      ACL: "public-read"
+    };
     try {
       let data = await s3.upload(s3Params).promise();
-      params.Item={...params.Item,image:data.Location};
-      console.log(params,'ffffff', data);
+      params.Item = { ...params.Item, image: data.Location };
+      console.log(params, 'ffffff', data);
 
     } catch (error) {
       console.log('erorr', error);
@@ -63,7 +62,7 @@ const createTemplate = async (event, context) => {
   }
 
   try {
-     await dynamoDb.put(params).promise();
+    await dynamoDb.put(params).promise();
     let response = responseHandler({
       statusCode: 200,
       message: 'Data Saved',
@@ -71,7 +70,7 @@ const createTemplate = async (event, context) => {
     });
     return response;
   } catch (error) {
-    console.log("error",error);
+    console.log("error", error);
     return responseHandler({
       statusCode: 500,
       message: 'Error Occur',

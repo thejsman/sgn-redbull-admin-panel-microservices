@@ -11,12 +11,13 @@ provider:
   runtime: nodejs14.x
   memorySize: 2048
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'eu-central-1'}
+  region: ${self:custom.region.${sls:stage}}
   environment:
     NOTIFICATION_TEMPLATE_TABLE: ${self:custom.NotificationTemplateTable}
     ACCESS_KEY: ${self:custom.settings.accessKeyId}
     SECRET_KEY: ${self:custom.settings.secretAccessKey}
-    PLATFORM_APPLICATION_ARN: ${self:custom.settings.PlatformApplicationArn}
+    S3_BUCKET_NAME : ${self:custom.s3BucketName.${sls:stage}}
+    REGION: ${self:provider.region}
 
   iamRoleStatements:
     - ${file(iam/NotificationTemplateTableIAM.yml):NotificationTemplateTableIAM}
@@ -65,12 +66,25 @@ functions:
 
 custom:
   NotificationTemplateTable: "NotificationTemplateTable-${sls:stage}"
-  myStage: ${opt:stage, self:provider.stage}
-  settings: ${file(./${opt:stage, 'dev'}.json):CREDS}
+  settings: ${file(./env.json):${sls:stage}}  
+
+  s3BucketName:
+    dev: sagoon-relationship-dev
+    staging: sagoon-staging
+
 
   domains:
-    prod: api.sagoonlite.com
     dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: api.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     basePath: "templateAdmin"

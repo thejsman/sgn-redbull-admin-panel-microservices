@@ -10,6 +10,7 @@ import { responseHandler } from "../lib/response";
     region: process.env.REGION,
   });
 
+// var s3 = new AWS.S3({});
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const createRelationship = async (event, context) => {
@@ -34,7 +35,7 @@ const createRelationship = async (event, context) => {
     const base64Data = new Buffer.from(data.base64.replace(/^data:image\/\w+;base64,/, ""), 'base64');
 
   var s3Params = {
-    Bucket: "sagoon-relationship-dev",
+    Bucket: process.env.S3_BUCKET_NAME,
     Key: data.fileName,
     Body: base64Data,
     ContentEncoding: 'base64',
