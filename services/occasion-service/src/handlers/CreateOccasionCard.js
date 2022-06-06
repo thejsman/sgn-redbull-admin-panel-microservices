@@ -5,9 +5,7 @@ import createError from "http-errors";
 import { v4 as uuid } from "uuid";
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
-var s3 = new AWS.S3({
-  region: process.env.S3BUCKET_REGION,
-});
+var s3 = new AWS.S3();
 async function CreateOccasionCard(event, context) {
   try {
     const data = event.body;
