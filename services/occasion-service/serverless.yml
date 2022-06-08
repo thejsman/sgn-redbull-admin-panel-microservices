@@ -15,7 +15,7 @@ provider:
     OCCASION_ICON_TABLE: ${self:custom.OccasionIconTable}
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
-    OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/admin/occasion-icons
+    OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/${env:upload_folder_${sls:stage}}
     CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
 
   iam:
