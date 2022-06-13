@@ -19,8 +19,12 @@ async function GetOnboarding(event, context) {
 			"welcomeback",
 		];
 		const responseObj = await getOnboardingData(sectionNames, sectionLanguage);
-		console.log("responseObj: ", responseObj);
-		return response(200, responseObj);
+
+		if (responseObj.length > 0) {
+			return response(200, responseObj);
+		} else {
+			return response(404, { message: "data not found" });
+		}
 	} catch (error) {
 		throw new createError.InternalServerError(error);
 	}

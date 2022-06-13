@@ -33,11 +33,6 @@ export const getOnboardingData = async (sectionNames, sectionLanguage) => {
 				let result = await dynamoDb.query(params).promise();
 
 				if (result.Items.length > 0) {
-					// responseObj[sectionName] = {
-					// sectionName: result.Items[0].sectionName,
-					// sectionLanguage: result.Items[0].sectionLanguage,
-					// content: result.Items[0].content,
-					// };
 					responseObj.push({
 						sectionName: result.Items[0].sectionName,
 						sectionLanguage: result.Items[0].sectionLanguage,
