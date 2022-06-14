@@ -80,7 +80,7 @@ custom:
     dev: dev.sagoonlite.com
     testing: testing.sagoon.com
     staging: staging.sagoon.com
-    prod: api.sagoon.com
+    prod: prod.sagoon.com
 
   region:
     dev: eu-central-1

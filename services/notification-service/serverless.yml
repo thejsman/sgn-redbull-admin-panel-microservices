@@ -16,7 +16,7 @@ provider:
     NOTIFICATION_TEMPLATE_TABLE: ${self:custom.NotificationTemplateTable}
     ACCESS_KEY: ${self:custom.settings.accessKeyId}
     SECRET_KEY: ${self:custom.settings.secretAccessKey}
-    S3_BUCKET_NAME : ${self:custom.s3BucketName.${sls:stage}}
+    S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}
     REGION: ${self:provider.region}
 
   iamRoleStatements:
@@ -66,18 +66,17 @@ functions:
 
 custom:
   NotificationTemplateTable: "NotificationTemplateTable-${sls:stage}"
-  settings: ${file(./env.json):${sls:stage}}  
+  settings: ${file(./env.json):${sls:stage}}
 
   s3BucketName:
     dev: sagoon-relationship-dev
     staging: sagoon-staging
 
-
   domains:
     dev: dev.sagoonlite.com
     testing: testing.sagoon.com
     staging: staging.sagoon.com
-    prod: api.sagoon.com
+    prod: prod.sagoon.com
 
   region:
     dev: eu-central-1

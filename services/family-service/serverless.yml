@@ -18,7 +18,7 @@ provider:
     SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
     REGION: ${self:provider.region}
     RELATIONSHIP_TABLE_NAME: RelationshipTable-${sls:stage}
-    S3_BUCKET_NAME : ${self:custom.s3BucketName.${sls:stage}}
+    S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}
 
   iamRoleStatements:
     - ${file(iam/RelationshipTableIAM.yml):RelationshipTableIAM}
@@ -63,16 +63,16 @@ functions:
 custom:
   RelationshipTableName: RelationshipTable-${sls:stage}
 
-
   s3BucketName:
     dev: sagoon-relationship-dev
     staging: sagoon-staging
+    prod: sagoon-prod
 
   domains:
     dev: dev.sagoonlite.com
     testing: testing.sagoon.com
     staging: staging.sagoon.com
-    prod: api.sagoon.com
+    prod: prod.sagoon.com
 
   region:
     dev: eu-central-1
@@ -87,4 +87,3 @@ custom:
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge
-
