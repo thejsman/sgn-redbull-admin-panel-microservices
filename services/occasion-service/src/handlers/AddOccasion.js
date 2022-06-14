@@ -9,6 +9,7 @@ var s3 = new AWS.S3();
 
 async function AddOccasion(event, context) {
   try {
+    console.log("event.body", event);
     let { occasionIdentifier, data, occasionName } = event.body;
     occasionIdentifier = occasionIdentifier.toLowerCase().trim();
     occasionName = occasionName.toLowerCase().trim();

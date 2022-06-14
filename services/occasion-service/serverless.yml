@@ -146,13 +146,13 @@ custom:
     dev: sagoon-2022-dev
     testing: sagoon-staging
     staging: sagoon-staging
-    prod: sagoon-staging
+    prod: sagoon-prod
 
   accessControlAllowOrigin:
     dev: "*"
     testing: "*"
     staging: "*.sagoon.com"
-    prod: "*.sagoon.com"
+    prod: "*"
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
