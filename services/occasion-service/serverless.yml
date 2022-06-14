@@ -15,6 +15,7 @@ provider:
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
     OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/admin/occasion-icons
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
   iam:
     role:
       statements:
@@ -143,6 +144,12 @@ custom:
     testing: sagoon-staging
     staging: sagoon-staging
     prod: sagoon-staging
+
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*.sagoon.com"
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
