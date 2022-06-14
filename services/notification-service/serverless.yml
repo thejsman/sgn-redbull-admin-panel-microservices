@@ -1,5 +1,5 @@
 service: admin-notification-service
-
+useDotenv: true
 frameworkVersion: "3"
 
 plugins:
@@ -14,14 +14,17 @@ provider:
   region: ${self:custom.region.${sls:stage}}
   environment:
     NOTIFICATION_TEMPLATE_TABLE: ${self:custom.NotificationTemplateTable}
-    ACCESS_KEY: ${self:custom.settings.accessKeyId}
-    SECRET_KEY: ${self:custom.settings.secretAccessKey}
+    ACCESS_KEY_ID: ${env:ACCESS_KEY_ID}
+    SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
     S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}
     REGION: ${self:provider.region}
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
 
-  iamRoleStatements:
-    - ${file(iam/NotificationTemplateTableIAM.yml):NotificationTemplateTableIAM}
-    - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+  iam:
+    role:
+      statements:
+        - ${file(iam/NotificationTemplateTableIAM.yml):NotificationTemplateTableIAM}
+        - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
 
 resources:
   Resources:
@@ -66,11 +69,11 @@ functions:
 
 custom:
   NotificationTemplateTable: "NotificationTemplateTable-${sls:stage}"
-  settings: ${file(./env.json):${sls:stage}}
 
   s3BucketName:
     dev: sagoon-relationship-dev
     staging: sagoon-staging
+    prod: sagoon-prod
 
   domains:
     dev: dev.sagoonlite.com
@@ -84,13 +87,15 @@ custom:
     staging: ap-southeast-1
     prod: ap-south-1
 
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*.sagoon.com"
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     basePath: "templateAdmin"
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: "edge"
-  authorizer:
-    name: VerifyTokenARN
-    arn:
-      Fn::ImportValue: VerifyTokenARN
