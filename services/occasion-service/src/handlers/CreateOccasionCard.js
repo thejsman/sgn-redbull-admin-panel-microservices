@@ -44,8 +44,15 @@ async function CreateOccasionCard(event, context) {
         ContentType: type,
       };
       s3data = await s3.upload(s3Params).promise();
-      data.lottie.lottieBackground = s3data.Location;
-      data.lottie.lottieBackgroundFileName = s3data.Location;
+
+      if (process.env.CDN_BUCKET_URL) {
+        data.lottie.lottieBackground = process.env.CDN_BUCKET_URL + s3data.Key;
+        data.lottie.lottieBackgroundFileName =
+          process.env.CDN_BUCKET_URL + s3data.Key;
+      } else {
+        data.lottie.lottieBackground = s3data.Location;
+        data.lottie.lottieBackgroundFileName = s3data.Location;
+      }
     }
     if (
       data.lottie.lottieGraphic &&
@@ -65,8 +72,14 @@ async function CreateOccasionCard(event, context) {
         ContentType: type,
       };
       s3data = await s3.upload(s3Params).promise();
-      data.lottie.lottieGraphic = s3data.Location;
-      data.lottie.lottieGraphicFileName = s3data.Location;
+      if (process.env.CDN_BUCKET_URL) {
+        data.lottie.lottieGraphic = process.env.CDN_BUCKET_URL + s3data.Key;
+        data.lottie.lottieGraphicFileName =
+          process.env.CDN_BUCKET_URL + s3data.Key;
+      } else {
+        data.lottie.lottieGraphic = s3data.Location;
+        data.lottie.lottieGraphicFileName = s3data.Location;
+      }
     }
 
     await dynamoDb
