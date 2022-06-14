@@ -15,6 +15,8 @@ provider:
 
   environment:
     SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
+
   iam:
     role:
       statements:
@@ -87,6 +89,13 @@ custom:
     testing: ap-southeast-1
     staging: ap-southeast-1
     prod: ap-south-1
+
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*.sagoon.com"
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
