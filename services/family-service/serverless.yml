@@ -19,10 +19,13 @@ provider:
     REGION: ${self:provider.region}
     RELATIONSHIP_TABLE_NAME: RelationshipTable-${sls:stage}
     S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
 
-  iamRoleStatements:
-    - ${file(iam/RelationshipTableIAM.yml):RelationshipTableIAM}
-    - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+  iam:
+    role:
+      statements:
+        - ${file(iam/RelationshipTableIAM.yml):RelationshipTableIAM}
+        - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
 
 functions:
   getOneRelationship:
@@ -79,6 +82,11 @@ custom:
     testing: ap-southeast-1
     staging: ap-southeast-1
     prod: ap-south-1
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*.sagoon.com"
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
