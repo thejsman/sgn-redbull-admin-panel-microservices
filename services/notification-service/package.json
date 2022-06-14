@@ -15,17 +15,10 @@
 		"webpack": "^5.70.0"
 	},
 	"dependencies": {
-		"@middy/core": "^2.5.7",
-		"@middy/http-error-handler": "^2.5.7",
-		"@middy/http-event-normalizer": "^2.5.7",
-		"@middy/http-json-body-parser": "^2.5.7",
 		"aws-sdk": "^2.1090.0",
 		"common-middleware": "^1.0.0",
 		"axios": "^0.26.1",
-		"http-errors": "^2.0.0",
 		"jsonwebtoken": "^8.5.1",
-		"serverless-domain-manager": "^6.0.2",
-		"twilio": "^3.75.1",
-		"uuid": "^8.3.2"
+		"serverless-domain-manager": "^6.0.2"
 	}
 }
