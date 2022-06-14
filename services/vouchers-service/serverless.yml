@@ -15,6 +15,7 @@ provider:
   environment:
     VOUCHER_TABLE_NAME: VoucherTable-${sls:stage}
     PENDING_VOUCHER_TIME: ${self:custom.pendingVoucherTime.${sls:stage}}
+    # S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}
 
   iam:
     role:
@@ -89,7 +90,13 @@ custom:
   cronTime:
     dev: 3 hours
     staging: 3 hours
-    prod: 5 minute
+    prod: 5 minutes
+
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*.sagoon.com"
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
