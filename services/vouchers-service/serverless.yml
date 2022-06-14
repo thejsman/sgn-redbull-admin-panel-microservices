@@ -31,35 +31,35 @@ functions:
     events:
       - http:
           method: POST
-          path: /voucher/create
+          path: /create
           cors: true
   updateVoucher:
     handler: src/handlers/updateVoucher.handler
     events:
       - http:
           method: PATCH
-          path: /voucher/update
+          path: /update
           cors: true
   voucherList:
     handler: src/handlers/vouchersList.handler
     events:
       - http:
           method: GET
-          path: /voucher/list
+          path: /list
           cors: true
   getVoucher:
     handler: src/handlers/getVoucher.handler
     events:
       - http:
           method: GET
-          path: /voucher/get
+          path: /get
           cors: true
   getVoucherById:
     handler: src/handlers/getVoucherByVoucherId.handler
     events:
       - http:
           method: GET
-          path: /voucher/getById
+          path: /getById
           cors: true
   processPendingVouchers:
     handler: src/handlers/processPendingVouchers.handler
@@ -73,7 +73,7 @@ custom:
     dev: dev.sagoonlite.com
     testing: testing.sagoon.com
     staging: staging.sagoon.com
-    prod: api.sagoon.com
+    prod: live.sagoon.com
 
   region:
     dev: eu-central-1
@@ -94,7 +94,7 @@ custom:
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: admin
+    basePath: adminVoucher
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge
