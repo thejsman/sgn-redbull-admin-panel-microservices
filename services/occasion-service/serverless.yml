@@ -1,4 +1,5 @@
 service: admin-occasion-service
+useDotenv: true
 frameworkVersion: "3"
 
 plugins:
@@ -14,8 +15,10 @@ provider:
     OCCASION_ICON_TABLE: ${self:custom.OccasionIconTable}
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
-    OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/admin/occasion-icons
+    OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/${env:upload_folder_${sls:stage}}
+    CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
+
   iam:
     role:
       statements:
@@ -154,7 +157,7 @@ custom:
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: occasion
+    basePath: admin-occasion
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge

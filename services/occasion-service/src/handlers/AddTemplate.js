@@ -27,7 +27,11 @@ async function AddTemplate(event, context) {
         ContentType: type,
       };
       let s3data = await s3.upload(s3Params).promise();
-      data.templateImage = s3data.Location;
+      if (process.env.CDN_BUCKET_URL) {
+        data.templateImage = process.env.CDN_BUCKET_URL + s3data.Key;
+      } else {
+        data.templateImage = s3data.Location;
+      }
     }
     let UpdateExpression = [];
     let ExpressionAttributeValues = {};

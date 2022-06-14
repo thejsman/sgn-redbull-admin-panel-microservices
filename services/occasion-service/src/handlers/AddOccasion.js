@@ -29,7 +29,12 @@ async function AddOccasion(event, context) {
         ContentType: type,
       };
       let s3data = await s3.upload(s3Params).promise();
-      data.occasionIcon = s3data.Location;
+      console.log("s3data ---", s3data);
+      if (process.env.CDN_BUCKET_URL) {
+        data.occasionIcon = process.env.CDN_BUCKET_URL + s3data.Key;
+      } else {
+        data.occasionIcon = s3data.Location;
+      }
     }
 
     let UpdateExpression = [];
