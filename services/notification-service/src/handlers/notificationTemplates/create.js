@@ -14,7 +14,7 @@ const createTemplate = async (event, context) => {
 	const timestamp = new Date();
 
 	const data = JSON.parse(event.body);
-
+	console.log("Check this", { event: event.body, data });
 	const params = {
 		TableName: process.env.NOTIFICATION_TEMPLATE_TABLE,
 		Item: {
