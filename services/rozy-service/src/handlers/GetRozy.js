@@ -43,9 +43,11 @@ async function GetRozy(event, context) {
       };
 
       let result = await dynamoDb.query(params).promise();
-      content = result.Items[0].content;
-      await setRedisItem(redisKey, 3600, result.Items[0].content);
-      console.log("from db");
+      if (result.Items.length > 0) {
+        content = result.Items[0].content;
+        await setRedisItem(redisKey, 3600, result.Items[0].content);
+        console.log("from db");
+      }
     }
     if (content) {
       return response(200, {
