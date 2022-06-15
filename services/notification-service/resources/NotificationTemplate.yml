@@ -1,16 +1,14 @@
 NotificationTemplateTable:
-  Type: 'AWS::DynamoDB::Table'
+  Type: AWS::DynamoDB::Table
   DeletionPolicy: Retain
   Properties:
     AttributeDefinitions:
-      -
-        AttributeName: notificationName
-        AttributeType: S 
+      - AttributeName: notificationName
+        AttributeType: S
     KeySchema:
-      -
-        AttributeName: notificationName
-        KeyType: HASH   
+      - AttributeName: notificationName
+        KeyType: HASH
     ProvisionedThroughput:
       ReadCapacityUnits: 5
-      WriteCapacityUnits: 5      
-    TableName: ${self:custom.NotificationTemplateTable}   
+      WriteCapacityUnits: 5
+    TableName: ${self:custom.NotificationTemplateTable}
