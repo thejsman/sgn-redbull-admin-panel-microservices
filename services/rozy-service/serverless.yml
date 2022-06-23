@@ -16,11 +16,12 @@ provider:
   environment:
     SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
-
+    STAGE: ${sls:stage}
   iam:
     role:
       statements:
         - ${file(iam/SectionNameIAM.yml):SectionNameIAM}
+        - ${file(iam/LambdaInvokeIAM.yml):LambdaInvokeIAM}
 resources:
   Resources:
     SectionNameTable: ${file(resources/SectionNameTable.yml):SectionNameTable}

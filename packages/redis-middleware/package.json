@@ -1,0 +1,9 @@
+{
+	"name": "redis-middleware",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"dependencies": {
+		"aws-sdk": "^2.1090.0"
+	}
+}
