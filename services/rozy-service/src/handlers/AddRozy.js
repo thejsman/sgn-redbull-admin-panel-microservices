@@ -1,5 +1,5 @@
 import AWS from "aws-sdk";
-import commonMiddleware from "../lib/commonMiddleware";
+import commonMiddleware from "common-middleware";
 import { response } from "../lib/utils";
 import createError from "http-errors";
 

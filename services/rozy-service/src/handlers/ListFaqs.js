@@ -1,4 +1,4 @@
-import commonMiddleware from "../lib/commonMiddleware";
+import commonMiddleware from "common-middleware";
 import { response } from "../lib/utils";
 import { rozyFaqs, rozyFaqsHindi, rozyFaqsHindiNepali } from "../lib/faqs";
 import createError from "http-errors";
