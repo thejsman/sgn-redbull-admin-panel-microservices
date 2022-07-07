@@ -1,4 +1,4 @@
-import commonMiddleware from "common-middleware";
+import commonMiddleware from "../../../../packages/common-middleware";
 import { responseHandler } from "../lib/response";
 import { voucherList } from "../lib/voucherHelper";
 
