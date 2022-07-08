@@ -2,7 +2,7 @@
 
 import { responseHandler } from "../lib/response";
 import { createVoucher } from "../lib/voucherHelper";
-import commonMiddleware from "common-middleware";
+import commonMiddleware from "../../../../packages/common-middleware";
 import { v4 as uuid } from "uuid";
 
 const addVoucher = async (event, context) => {

@@ -1,7 +1,7 @@
 /*eslint new-cap: ["error", { "newIsCap": false }]*/
 const AWS = require("aws-sdk");
 const { responseHandler } = require("../lib/response");
-import commonMiddleware from "common-middleware";
+import commonMiddleware from "../../../../packages/common-middleware";
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const updateVoucher = async (event, context) => {

@@ -1,0 +1,15 @@
+TransactionsTableIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:Query
+    - dynamodb:DeleteItem
+    - dynamodb:Scan
+    - dynamodb:BatchWriteItem
+
+  Resource:
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRANSACTION_TABLE_NAME}"
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TRANSACTION_TABLE_NAME}/index/*"
