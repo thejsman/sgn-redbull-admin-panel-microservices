@@ -1,7 +1,7 @@
 /*eslint new-cap: ["error", { "newIsCap": false }]*/
 
 import { responseHandler } from "../lib/response";
-import { saveInvitation,radmonAlpha } from "../lib/invitationHelper";
+import { saveInvitation, radmonAlpha } from "../lib/invitationHelper";
 
 const createInvitationCode = async (event, context) => {
 	try {
@@ -10,7 +10,7 @@ const createInvitationCode = async (event, context) => {
 		let invitationObject = {
 			pk: invitationCode,
 			phone,
-			newPhone:phone,
+			newPhone: phone,
 			countryCode: dialCode.replace("+", ""),
 			firstName,
 			lastName,
