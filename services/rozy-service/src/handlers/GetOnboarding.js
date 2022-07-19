@@ -18,6 +18,7 @@ async function GetOnboarding(event, context) {
 			"namescreen",
 			"homescreen",
 			"welcomeback",
+			"dateofbirth",
 		];
 		//redisKey is
 		let redisKey = `ROZY:ONBOARDING:${sectionLanguage.toUpperCase()}`;
