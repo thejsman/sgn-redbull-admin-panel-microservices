@@ -7,11 +7,12 @@ import moment from "moment";
 
 const getTransactionsByDate = async (event, context) => {
 	try {
-		const { transactionDate, createdAt } = event.queryStringParameters;
+		const { transactionDate, transactionId, userId, status, limit } = event.queryStringParameters;
 		let transactionObject = {
 			transactionDate: transactionDate ? transactionDate : moment().format("YYYY-MM-DD"),
-			createdAt,
-			limit: 10
+			transactionId, userId,
+			limit: limit ? +limit:5,
+			status
 		};
 		try {
 			let data = await getTransactionsDateWise(transactionObject);
@@ -30,7 +31,7 @@ const getTransactionsByDate = async (event, context) => {
 			});
 		}
 	} catch (error) {
-		console.log("error",error);
+		console.log("error", error);
 		return responseHandler({
 			statusCode: 500,
 			message: "Internal Server Error",
@@ -40,3 +41,5 @@ const getTransactionsByDate = async (event, context) => {
 };
 
 export const handler = getTransactionsByDate;
+
+
