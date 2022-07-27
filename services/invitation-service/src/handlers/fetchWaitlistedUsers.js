@@ -17,7 +17,7 @@ const fetchWaitlistedUsers = async (event, context) => {
       params.KeyConditionExpression = "pk = :pk";
       params.ExpressionAttributeValues = { ":pk": mobile };
     } else if (date) {
-      params.IndexName = "waitlisted_created_date";
+      params.IndexName = "waitlisteduser_created_date";
       params.KeyConditionExpression = "#date = :date";
       params.ExpressionAttributeValues = { ":date": date };
       params.ExpressionAttributeNames = { "#date": "date" };
@@ -29,29 +29,13 @@ const fetchWaitlistedUsers = async (event, context) => {
       });
     }
     console.log("params--", params);
-    let result = await Promise.all(
-      mobile
-        ? [dynamoDb.query(params).promise()]
-        : date.map((dateItem) => {
-            return dynamoDb
-              .query({
-                ...params,
-                ExpressionAttributeValues: { ":date": dateItem },
-              })
-              .promise();
-          })
-    );
-    console.log("results", result);
-    if (result.length > 0) {
-      //now club all, the data into one data source
-      let clubedData = result.reduce((finalObj, dateItems) => {
-        finalObj = [...finalObj, ...dateItems.Items];
-        return finalObj;
-      }, []);
+    let result = await dynamoDb.query(params).promise();
+    console.log("results", JSON.stringify(result));
+    if (result.Items.length > 0) {
       return responseHandler({
         statusCode: 200,
         message: "Data found",
-        data: clubedData,
+        data: result.Items,
       });
     }
   } catch (error) {
