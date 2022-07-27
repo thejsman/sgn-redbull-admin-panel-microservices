@@ -40,7 +40,7 @@ functions:
     handler: src/handlers/fetchWaitlistedUsers.handler
     events:
       - http:
-          method: POST
+          method: GET
           path: /fetchWaitListedUsers
           cors: true
 custom:

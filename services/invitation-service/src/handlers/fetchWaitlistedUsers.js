@@ -7,7 +7,7 @@ import AWS from "aws-sdk";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const fetchWaitlistedUsers = async (event, context) => {
   try {
-    let { mobile, date, key } = JSON.parse(event.body);
+    let { mobile, date, key } = event.queryStringParameters;
     let isNextRecordExists = false;
     const params = {
       TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
