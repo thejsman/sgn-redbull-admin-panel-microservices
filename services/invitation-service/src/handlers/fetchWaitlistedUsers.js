@@ -7,7 +7,7 @@ import AWS from "aws-sdk";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const fetchWaitlistedUsers = async (event, context) => {
   try {
-    const { mobile, date } = JSON.parse(event.body);
+    let { mobile, date, key } = JSON.parse(event.body);
     const params = {
       TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
       ProjectionExpression:
@@ -17,6 +17,11 @@ const fetchWaitlistedUsers = async (event, context) => {
       params.KeyConditionExpression = "pk = :pk";
       params.ExpressionAttributeValues = { ":pk": mobile };
     } else if (date) {
+      params.ExclusiveStartKey = key
+        ? JSON.parse(Buffer.from(key, "base64").toString("ascii"))
+        : undefined;
+      params.Limit = 1;
+      params.ScanIndexForward = false;
       params.IndexName = "waitlisteduser_created_date";
       params.KeyConditionExpression = "#date = :date";
       params.ExpressionAttributeValues = { ":date": date };
@@ -30,12 +35,21 @@ const fetchWaitlistedUsers = async (event, context) => {
     }
     console.log("params--", params);
     let result = await dynamoDb.query(params).promise();
-    console.log("results", JSON.stringify(result));
+    console.log("results", JSON.stringify(result), result.LastEvaluatedKey);
+    //check if last evaluation key exists
+    if (result.LastEvaluatedKey) {
+      key = Buffer.from(JSON.stringify(result.LastEvaluatedKey)).toString(
+        "base64"
+      );
+    } else {
+      key = "";
+    }
+    console.log("result.LastEvaluatedKey ---", key);
     if (result.Items.length > 0) {
       return responseHandler({
         statusCode: 200,
         message: "Data found",
-        data: result.Items,
+        data: { items: result.Items, key },
       });
     }
   } catch (error) {
