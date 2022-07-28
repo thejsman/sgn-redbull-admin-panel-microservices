@@ -5,10 +5,13 @@ import { saveInvitation, radmonAlpha, sendSMS } from "../lib/invitationHelper";
 
 const createInvitationCode = async (event, context) => {
   try {
-    let { phone, dialCode, firstName, lastName, receiversList, bulk } =
-      JSON.parse(event.body);
+    let { phone, dialCode, firstName, lastName, receiversList } = JSON.parse(
+      event.body
+    );
+    let bulk = true;
     if (!receiversList) {
       receiversList = [{ phone, dialCode, firstName, lastName }];
+      bulk = false;
     }
     let result = await Promise.all(
       receiversList.map(async ({ phone, dialCode, firstName, lastName }) => {
@@ -31,8 +34,6 @@ const createInvitationCode = async (event, context) => {
       })
     );
 
-    console.log("resultObj", result);
-
     let response = responseHandler({
       statusCode: 200,
       message: "Invitation Code",
@@ -40,6 +41,7 @@ const createInvitationCode = async (event, context) => {
     });
     return response;
   } catch (error) {
+    console.log("error", error);
     return responseHandler({
       statusCode: 500,
       message: "Internal Server Error",
