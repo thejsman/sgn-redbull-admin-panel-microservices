@@ -1,0 +1,9 @@
+WaitlistedUsersIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+
+  Resource:
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WAITLISTEDUSERS_TABLE_NAME}"
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WAITLISTEDUSERS_TABLE_NAME}/index/*"

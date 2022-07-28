@@ -18,12 +18,14 @@ provider:
     # SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
     REGION: ${self:provider.region}
     INVITATION_TABLE_NAME: InvitationTable-${sls:stage}
+    WAITLISTEDUSERS_TABLE_NAME: WaitlistedUsersTable-${sls:stage}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
 
   iam:
     role:
       statements:
         - ${file(iam/InvitationTableIAM.yml):InvitationTableIAM}
+        - ${file(iam/WaitlistedUsersIAM.yml):WaitlistedUsersIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
 
 functions:
@@ -33,6 +35,13 @@ functions:
       - http:
           method: POST
           path: /invitation/create
+          cors: true
+  fetchWaitListedUsers:
+    handler: src/handlers/fetchWaitlistedUsers.handler
+    events:
+      - http:
+          method: GET
+          path: /fetchWaitListedUsers
           cors: true
 custom:
   InvitationTableName: InvitationTable-${sls:stage}
