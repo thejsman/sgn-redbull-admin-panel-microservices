@@ -36,7 +36,7 @@ export const sendSMS = async ({ dialCode, phone, invitationCode }) => {
     const flowId = "62cec8b74b9314686017b592";
     let result;
     if (dialCode == "91") {
-      result = await sendIndiaSMS(flowId, phone, {
+      result = await sendIndiaSMS(flowId, `${dialCode}${phone}`, {
         invitationCode,
         appLink,
       });
