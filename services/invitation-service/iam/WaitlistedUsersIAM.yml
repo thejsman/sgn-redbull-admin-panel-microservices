@@ -3,6 +3,8 @@ WaitlistedUsersIAM:
   Action:
     - dynamodb:Query
     - dynamodb:GetItem
+    - dynamodb:Scan
+    - dynamodb:PutItem
 
   Resource:
     - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WAITLISTEDUSERS_TABLE_NAME}"

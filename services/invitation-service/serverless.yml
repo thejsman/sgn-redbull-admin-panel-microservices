@@ -43,6 +43,13 @@ functions:
           method: GET
           path: /fetchWaitListedUsers
           cors: true
+  updateWaitListedUsers:
+    handler: src/handlers/batchUpdateWaitlistedUser.handler
+    events:
+      - http:
+          method: GET
+          path: /updateWaitListedUsers
+          cors: true
 custom:
   InvitationTableName: InvitationTable-${sls:stage}
 
