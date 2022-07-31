@@ -25,7 +25,7 @@ async function GetOnboarding(event, context) {
 		//geting from cache if exists in cache
 		let content = await getRedisItem(redisKey);
 		content = JSON.parse(JSON.parse(content.Payload));
-		console.log("cache content", content);
+		// console.log("cache content", content);
 		if (!content) {
 			console.log("from db..");
 			const responseObj = await getOnboardingData(

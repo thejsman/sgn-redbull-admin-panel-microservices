@@ -24,7 +24,7 @@ async function GetRozy(event, context) {
 		let content = await getRedisItem(redisKey);
 
 		content = JSON.parse(JSON.parse(content.Payload));
-		console.log("cache content", content);
+		// console.log("cache content", content);
 
 		if (!content) {
 			const params = {
