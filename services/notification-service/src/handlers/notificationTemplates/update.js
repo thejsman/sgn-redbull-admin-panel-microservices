@@ -60,9 +60,11 @@ const updateTemplate = async (event, context) => {
 				":sound": data.sound,
 				":event": data.event,
 				":event_type": data.event_type,
+				":isPushToShow": data.isPushToShow,
+
 			},
 			UpdateExpression:
-				"SET #title = :title, image = :image, message = :message, body = :body, composed = :composed,badge = :badge, priority = :priority,sound = :sound,event = :event,event_type = :event_type",
+				"SET #title = :title, image = :image, message = :message, body = :body, composed = :composed,badge = :badge, priority = :priority,sound = :sound,event = :event,event_type = :event_type,isPushToShow =:isPushToShow",
 			ReturnValues: "ALL_NEW",
 		};
 	} else {
@@ -84,9 +86,10 @@ const updateTemplate = async (event, context) => {
 				":sound": data.sound,
 				":event": data.event,
 				":event_type": data.event_type,
+				":isPushToShow": data.isPushToShow,
 			},
 			UpdateExpression:
-				"SET #title = :title, message = :message, body = :body, composed = :composed,badge = :badge, priority = :priority,sound = :sound,event = :event,event_type = :event_type",
+				"SET #title = :title, message = :message, body = :body, composed = :composed,badge = :badge, priority = :priority,sound = :sound,event = :event,event_type = :event_type,isPushToShow =:isPushToShow",
 			ReturnValues: "ALL_NEW",
 		};
 	}

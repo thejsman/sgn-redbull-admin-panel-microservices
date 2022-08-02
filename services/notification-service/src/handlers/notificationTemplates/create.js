@@ -30,6 +30,7 @@ const createTemplate = async (event, context) => {
 			event_type: data.event_type,
 			createdAt: timestamp,
 			updatedAt: timestamp,
+			isPushToShow: data.isPushToShow
 		},
 	};
 
