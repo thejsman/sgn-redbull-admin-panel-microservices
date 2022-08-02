@@ -6,31 +6,105 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 export const getTransactionsDateWise = async (data) => {
 	try {
+		let params = {};
+
+		if (data.status && data.transactionDate) {
+			params = {
+				TableName: process.env.TRANSACTION_TABLE_NAME,
+				Limit: +data.limit,
+				IndexName: "transactionDate-transactionStatus-Index",
+				ScanIndexForward: true,
+				KeyConditionExpression:
+					"#transactionDate = :transactionDate AND #transactionStatus = :transactionStatus",
+				ExpressionAttributeNames: {
+					"#transactionDate": "transactionDate",
+					"#transactionStatus": "transactionStatus"
+					// "#displayOrder": "displayOrder"
+				},
+				ExpressionAttributeValues: {
+					":transactionDate": data.transactionDate,
+					":transactionStatus": data.status
+
+					// ":sOrder": +data.sOrder,
+					// ":eOrder": +data.eOrder
+				},
+			};
+			if (data.transactionId) {
+				params = {
+					...params,
+					ExclusiveStartKey: {
+						transactionDate: data.transactionDate,
+						transactionId: data.transactionId,
+						userId: data.userId,
+						transactionStatus: data.status
+					},
+				};
+			}
+		}
+		else {
+			params = {
+				TableName: process.env.TRANSACTION_TABLE_NAME,
+				Limit: +data.limit,
+				IndexName: "transactionDate-transactionStatus-Index",
+				ScanIndexForward: true,
+				KeyConditionExpression:
+					"#transactionDate = :transactionDate",
+				ExpressionAttributeNames: {
+					"#transactionDate": "transactionDate",
+					// "#displayOrder": "displayOrder"
+				},
+				ExpressionAttributeValues: {
+					":transactionDate": data.transactionDate
+
+					// ":sOrder": +data.sOrder,
+					// ":eOrder": +data.eOrder
+				},
+			};
+			if (data.createdAt) {
+				params = {
+					...params,
+					ExclusiveStartKey: {
+						transactionDate: data.transactionDate,
+						transactionId: data.transactionId,
+						userId: data.userId,
+						transactionStatus: data.status
+					},
+				};
+			}
+		}
+		return await dynamodb.query(params).promise();
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getTransactionsByUserId = async (data) => {
+	try {
 		let params = {
 			TableName: process.env.TRANSACTION_TABLE_NAME,
 			Limit: +data.limit,
-			IndexName: "transactionDate-createdAt-Index",
 			ScanIndexForward: true,
 			KeyConditionExpression:
-				"#transactionDate = :transactionDate",
+				"#userId = :userId",
 			ExpressionAttributeNames: {
-				"#transactionDate": "transactionDate",
+				"#userId": "userId",
 				// "#displayOrder": "displayOrder"
 			},
 			ExpressionAttributeValues: {
-				":transactionDate": data.transactionDate,
+				":userId": data.userId,
 				// ":sOrder": +data.sOrder,
 				// ":eOrder": +data.eOrder
 			},
 		};
 
-		if (data.createdAt) {
+		if (data.transactionId) {
 			params = {
 				...params,
 				ExclusiveStartKey: {
-					transactionDate: data.transactionDate,
-					createdAt: data.createdAt
+					transactionId: data.transactionId,
+					userId: data.userId
 				},
+
 			};
 		}
 		return await dynamodb.query(params).promise();
@@ -39,3 +113,63 @@ export const getTransactionsDateWise = async (data) => {
 	}
 };
 
+export const getTransactionsStatusWise = async (data) => {
+	try {
+		let params = {
+			TableName: process.env.TRANSACTION_TABLE_NAME,
+			Limit: +data.limit,
+			IndexName: "transactionStatus-Index",
+			ScanIndexForward: true,
+			KeyConditionExpression:
+				"#transactionStatus = :transactionStatus",
+			ExpressionAttributeNames: {
+				"#transactionStatus": "transactionStatus",
+				// "#displayOrder": "displayOrder"
+			},
+			ExpressionAttributeValues: {
+				":transactionStatus": data.status,
+				// ":sOrder": +data.sOrder,
+				// ":eOrder": +data.eOrder
+			},
+		};
+
+		if (data.transactionId) {
+			params = {
+				...params,
+				ExclusiveStartKey: {
+					transactionId: data.transactionId,
+					userId: data.userId,
+					transactionStatus: data.status
+				},
+
+			};
+		}
+		return await dynamodb.query(params).promise();
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getTransactionsByTransactionId = async (data) => {
+	try {
+		let params = {
+			TableName: process.env.TRANSACTION_TABLE_NAME,
+			IndexName:"transactionId-Index",
+			KeyConditionExpression:
+				"#transactionId = :transactionId",
+			ExpressionAttributeNames: {
+				"#transactionId": "transactionId",
+				// "#displayOrder": "displayOrder"
+			},
+			ExpressionAttributeValues: {
+				":transactionId": data.transactionId
+
+				// ":sOrder": +data.sOrder,
+				// ":eOrder": +data.eOrder
+			},
+		};
+		return await dynamodb.query(params).promise();
+	} catch (error) {
+		throw error;
+	}
+};

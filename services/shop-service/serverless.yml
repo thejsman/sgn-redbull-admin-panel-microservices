@@ -18,11 +18,13 @@ provider:
     SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
     REGION: ${self:provider.region}
     TRANSACTION_TABLE_NAME: TransactionsTable-${sls:stage}
+    USER_TABLE_NAME: UserTable-${sls:stage}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
 
   iam:
     role:
       statements:
+        - ${file(iam/UserTableIAM.yml):UserTableIAM}
         - ${file(iam/TransactionsTableIAM.yml):TransactionsTableIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
 
@@ -34,8 +36,30 @@ functions:
           method: GET
           path: /transaction/getByDate
           cors: true
+  getTransactionsOfUser:
+    handler: src/handlers/getTransactionsOfUser.handler
+    events:
+      - http:
+          method: GET
+          path: /transaction/byUserId
+          cors: true   
+  getTransactionsByStatus:
+    handler: src/handlers/getTransactionsByStatus.handler
+    events:
+      - http:
+          method: GET
+          path: /transaction/byStatus
+          cors: true   
+  getTransactionsByTransactionId:
+    handler: src/handlers/getTransactionsById.handler
+    events:
+      - http:
+          method: GET
+          path: /transaction/transactionId
+          cors: true                             
 custom:
   TransactionsTableName: TransactionsTable-${sls:stage}
+  UserTableName: UserTable-${sls:stage}
 
   domains:
     dev: dev.sagoonlite.com
