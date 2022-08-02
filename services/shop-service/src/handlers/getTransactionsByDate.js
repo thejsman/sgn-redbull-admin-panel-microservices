@@ -38,6 +38,7 @@ const getTransactionsByDate = async (event, context) => {
 			data: {},
 		});
 	}
+	
 };
 
 export const handler = getTransactionsByDate;
