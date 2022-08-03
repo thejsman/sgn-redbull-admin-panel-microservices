@@ -12,7 +12,7 @@ const fetchWaitlistedUsers = async (event, context) => {
     const params = {
       TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
       ProjectionExpression:
-        "deviceType, countryCode, createdAt, countryName, pk, phone, dialCode",
+        "deviceType, countryCode, createdAt, countryName, pk, phone, dialCode,codeSentInfo",
     };
     if (mobile) {
       //if there is a mobile number in query then give first priority to mibile number

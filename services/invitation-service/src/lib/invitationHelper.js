@@ -18,6 +18,27 @@ export const saveInvitation = async (invitation) => {
 		})
 		.promise();
 };
+export const retrieveWaitlistedInfo = async (pk) => {
+  let waitlistedUserInfo = await dynamodb
+    .get({
+      TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
+      Key: { pk },
+    })
+    .promise();
+  return waitlistedUserInfo;
+};
+export const updateWaitlistedUserInfo = async (data) => {
+  try {
+    await dynamodb
+      .put({
+        TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
+        Item: data,
+      })
+      .promise();
+  } catch (e) {
+    console.log(e, data);
+  }
+};
 
 export const radmonAlpha = (number) => {
 	var text = "";
