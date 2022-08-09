@@ -50,6 +50,13 @@ functions:
           method: GET
           path: /updateWaitListedUsers
           cors: true
+  deleteWaitListedUsers:
+    handler: src/handlers/deleteWaitlistedUser.handler
+    events:
+      - http:
+          method: DELETE
+          path: /delete/{pk}
+          cors: true
 custom:
   InvitationTableName: InvitationTable-${sls:stage}
 

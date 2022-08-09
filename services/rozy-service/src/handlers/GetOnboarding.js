@@ -21,6 +21,7 @@ async function GetOnboarding(event, context) {
 			"dateofbirth",
 			"invitationrequestinprocessscreen",
 			"invitationrequeststillinprocess",
+			"onboardingemail",
 		];
 		//redisKey is
 		let redisKey = `ROZY:ONBOARDING:${sectionLanguage.toUpperCase()}`;
