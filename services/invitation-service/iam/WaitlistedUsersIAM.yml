@@ -5,6 +5,7 @@ WaitlistedUsersIAM:
     - dynamodb:GetItem
     - dynamodb:Scan
     - dynamodb:PutItem
+    - dynamodb:DeleteItem
 
   Resource:
     - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WAITLISTEDUSERS_TABLE_NAME}"
