@@ -16,6 +16,7 @@ provider:
     OCCASION_TEMPLATES_TABLE: ${self:custom.OccasionTemplatesTable}
     OCCASION_CARD_TABLE: ${self:custom.OccasionCardTable}
     OCCASION_ICON_FOLDER: ${self:custom.bucket.${sls:stage}}/${env:upload_folder_${sls:stage}}
+    LOTTIE_BACKGROUND_IMAGE_FOLDER: ${self:custom.bucket.${sls:stage}}/home-screen/lottie
     CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
 
