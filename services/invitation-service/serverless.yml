@@ -20,6 +20,7 @@ provider:
     INVITATION_TABLE_NAME: InvitationTable-${sls:stage}
     WAITLISTEDUSERS_TABLE_NAME: WaitlistedUsersTable-${sls:stage}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
+    USER_EXPORT_REQUEST_QUEUE: https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/userExportRequestQueue-${sls:stage}
 
   iam:
     role:
@@ -27,6 +28,11 @@ provider:
         - ${file(iam/InvitationTableIAM.yml):InvitationTableIAM}
         - ${file(iam/WaitlistedUsersIAM.yml):WaitlistedUsersIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/userExportRequestQueueIAM.yml):userExportRequestQueueIAM}
+        - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
+resources:
+  Resources:
+    userExportRequestQueue: ${file(resources/userExportRequestQueue.yml):userExportRequestQueue}
 
 functions:
   createInvitationCode:
@@ -57,6 +63,18 @@ functions:
           method: DELETE
           path: /delete/{pk}
           cors: true
+  requestUserDataToExport:
+    handler: src/handlers/requestUserDataToExport.handler
+    events:
+      - http:
+          method: GET
+          path: /requestUserDataToExport
+          cors: true
+  processUserExportQueue:
+    handler: src/handlers/lambdaToProcessUserExportRequest.handler
+    events:
+      - sqs:
+          arn: !GetAtt [userExportRequestQueue, Arn]
 custom:
   InvitationTableName: InvitationTable-${sls:stage}
 

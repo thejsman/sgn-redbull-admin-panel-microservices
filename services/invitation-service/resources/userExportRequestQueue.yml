@@ -1,0 +1,4 @@
+userExportRequestQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: userExportRequestQueue-${sls:stage}
