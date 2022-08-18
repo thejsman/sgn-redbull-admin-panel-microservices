@@ -1,5 +1,6 @@
 import { parse } from "json2csv";
 import AWS from "aws-sdk";
+import { sendEmailToAdmin } from "../lib/sendEmail";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3();
 const lambdaToProcessUserExportRequest = async (event, context) => {
@@ -46,7 +47,9 @@ const lambdaToProcessUserExportRequest = async (event, context) => {
   try {
     let s3Result = await s3.upload(s3Params).promise();
     let csvFileUrl = s3Result.Location;
-    console.log("re----", re);
+    console.log("re----", s3Result);
+    //send Email to admin person with this file url
+    await sendEmailToAdmin("Download requested csv", csvFileUrl);
   } catch (e) {
     console.log("e-----", e);
   }

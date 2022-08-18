@@ -30,6 +30,7 @@ provider:
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
         - ${file(iam/userExportRequestQueueIAM.yml):userExportRequestQueueIAM}
         - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
+        - ${file(iam/SendEmailIAM.yml):SendEmailIAM}
 resources:
   Resources:
     userExportRequestQueue: ${file(resources/userExportRequestQueue.yml):userExportRequestQueue}
