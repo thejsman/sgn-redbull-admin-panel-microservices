@@ -5,7 +5,7 @@ export const sendEmailToAdmin = async (subject, body) => {
   const params = {
     Source: "Sagoon <niranjan.bhambi@sagoon.com>",
     Destination: {
-      ToAddresses: ["niranjan.bhambi@sagoon.com", "ankit.rathi@sagoon.com"],
+      ToAddresses: ["ankit.rathi@sagoon.com"],
     },
     Message: {
       Body: {

@@ -28,12 +28,13 @@ const lambdaToProcessUserExportRequest = async (event, context) => {
   let usersFound = await Promise.all(
     allDates.map(async (curDate) => {
       params.ExpressionAttributeValues = { ":date": curDate };
-      return await dynamoDb.query(params).promise();
+      return await fetchAllUsersForDate(params);
     })
   );
+  console.log("usersFound raw ---", usersFound);
   //merge all data into single one objects Array
   usersFound = usersFound.reduce((finalObj, objArray) => {
-    finalObj = [...finalObj, ...objArray.Items];
+    finalObj = [...finalObj, ...objArray];
     return finalObj;
   }, []);
   const csvPayload = parse(usersFound, { header: true, defaultValue: "-----" });
@@ -47,12 +48,23 @@ const lambdaToProcessUserExportRequest = async (event, context) => {
   try {
     let s3Result = await s3.upload(s3Params).promise();
     let csvFileUrl = s3Result.Location;
-    console.log("re----", s3Result);
     //send Email to admin person with this file url
     await sendEmailToAdmin("Download requested csv", csvFileUrl);
   } catch (e) {
     console.log("e-----", e);
   }
+};
+
+const fetchAllUsersForDate = async (params, users = []) => {
+  let paramObj = Object.assign({}, params);
+  paramObj.Limit = 1;
+  let result = await dynamoDb.query(params).promise();
+  users = [...users, ...result.Items];
+  if (result.LastEvaluatedKey) {
+    paramObj.ExclusiveStartKey = result.LastEvaluatedKey;
+    await fetchAllUsersForDate(paramObj, users);
+  }
+  return users;
 };
 
 export const handler = lambdaToProcessUserExportRequest;
