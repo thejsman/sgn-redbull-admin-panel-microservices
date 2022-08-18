@@ -1,11 +1,12 @@
 import AWS from "aws-sdk";
 const ses = new AWS.SES();
 
-export const sendEmailToAdmin = async (subject, body) => {
+export const sendEmailToAdmin = async (subject, body, email = "") => {
+  console.log("email --", email);
   const params = {
     Source: "Sagoon <niranjan.bhambi@sagoon.com>",
     Destination: {
-      ToAddresses: ["ankit.rathi@sagoon.com"],
+      ToAddresses: [!email ? "niranjan.bhambi@sagoon.com" : email],
     },
     Message: {
       Body: {
@@ -21,7 +22,6 @@ export const sendEmailToAdmin = async (subject, body) => {
 
   try {
     const result = await ses.sendEmail(params).promise();
-    console.log("email status---", result);
     return result;
   } catch (error) {
     console.error(error);

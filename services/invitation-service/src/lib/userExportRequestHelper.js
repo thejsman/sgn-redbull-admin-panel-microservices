@@ -17,3 +17,20 @@ export const sendMessageToUserExportQueue = async (data) => {
     }
   });
 };
+
+export const deleteMessageFromQueue = async (ReceiptHandle) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await sqs
+        .deleteMessage({
+          QueueUrl: process.env.USER_EXPORT_REQUEST_QUEUE,
+          ReceiptHandle,
+        })
+        .promise();
+      resolve("success");
+    } catch (error) {
+      console.log("Error in ", error);
+      reject(error);
+    }
+  });
+};

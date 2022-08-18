@@ -1,12 +1,20 @@
 import { parse } from "json2csv";
 import AWS from "aws-sdk";
 import { sendEmailToAdmin } from "../lib/sendEmail";
+import { deleteMessageFromQueue } from "../lib/userExportRequestHelper";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3();
 const lambdaToProcessUserExportRequest = async (event, context) => {
   //date range from, it will be downloaded
-  let { startDate, endDate } = JSON.parse(event.Records[0].body);
+  let { startDate, endDate, email } = JSON.parse(event.Records[0].body);
+  let { receiptHandle } = event.Records[0];
+  let fileName = !endDate ? `${startDate}.csv` : `${startDate}:${endDate}.csv`;
+  let csvFileUrl = "";
   let currentDate = startDate;
+  let emailSubject = `for date ${
+    !endDate ? startDate : `range from ${startDate} to ${endDate}`
+  } `;
+  endDate = !endDate ? startDate : endDate;
   let allDates = [];
   do {
     allDates = [...allDates, currentDate];
@@ -31,25 +39,39 @@ const lambdaToProcessUserExportRequest = async (event, context) => {
       return await fetchAllUsersForDate(params);
     })
   );
-  console.log("usersFound raw ---", usersFound);
   //merge all data into single one objects Array
   usersFound = usersFound.reduce((finalObj, objArray) => {
     finalObj = [...finalObj, ...objArray];
     return finalObj;
   }, []);
-  const csvPayload = parse(usersFound, { header: true, defaultValue: "-----" });
-  //Now upload data on S3
-  const s3Params = {
-    Bucket: "sagoon-2022-dev",
-    Key: `userReport/${startDate}.csv`,
-    Body: csvPayload,
-    ContentType: "application/octet-stream",
-  };
+
   try {
-    let s3Result = await s3.upload(s3Params).promise();
-    let csvFileUrl = s3Result.Location;
+    //check whether users list is there to donwload or not otherwise send email saying no user found
+    if (usersFound.length) {
+      const csvPayload = parse(usersFound, {
+        header: true,
+        defaultValue: "-----",
+      });
+      //Now upload data on S3
+      const s3Params = {
+        Bucket: process.env.BUCKET_FOR_WAITLISTED_USER_REPORT,
+        Key: `user-report/${fileName}`,
+        Body: csvPayload,
+        ContentType: "application/octet-stream",
+      };
+      let s3Result = await s3.upload(s3Params).promise();
+      csvFileUrl = `${process.env.CDN_URL_FOR_BUCKET}${s3Result.Key}`;
+    }
     //send Email to admin person with this file url
-    await sendEmailToAdmin("Download requested csv", csvFileUrl);
+    await sendEmailToAdmin(
+      usersFound.length
+        ? `Waitlisted users ${fileName} download as requested`
+        : `No waitlisted users found ${emailSubject} as requested`,
+      usersFound.length ? csvFileUrl : "No data found",
+      email
+    );
+    //now delete SQS message ID so that it will not process again
+    await deleteMessageFromQueue(receiptHandle);
   } catch (e) {
     console.log("e-----", e);
   }
