@@ -7,15 +7,20 @@ import moment from "moment";
 
 const getTransactionsByDate = async (event, context) => {
 	try {
-		const { transactionDate, transactionId, userId, status, limit } =
-			event.queryStringParameters;
+		const {
+			transactionDate,
+			transactionId,
+			userId,
+			status,
+			limit = 50,
+		} = event.queryStringParameters;
 		let transactionObject = {
 			transactionDate: transactionDate
 				? transactionDate
 				: moment().format("YYYY-MM-DD"),
 			transactionId,
 			userId,
-			limit: limit ? +limit : 5,
+			limit: limit ? +limit : 50,
 			status,
 		};
 		try {
