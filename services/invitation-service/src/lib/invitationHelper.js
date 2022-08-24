@@ -19,25 +19,25 @@ export const saveInvitation = async (invitation) => {
 		.promise();
 };
 export const retrieveWaitlistedInfo = async (pk) => {
-  let waitlistedUserInfo = await dynamodb
-    .get({
-      TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
-      Key: { pk },
-    })
-    .promise();
-  return waitlistedUserInfo;
+	let waitlistedUserInfo = await dynamodb
+		.get({
+			TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
+			Key: { pk },
+		})
+		.promise();
+	return waitlistedUserInfo;
 };
 export const updateWaitlistedUserInfo = async (data) => {
-  try {
-    await dynamodb
-      .put({
-        TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
-        Item: data,
-      })
-      .promise();
-  } catch (e) {
-    console.log(e, data);
-  }
+	try {
+		await dynamodb
+			.put({
+				TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
+				Item: data,
+			})
+			.promise();
+	} catch (e) {
+		console.log(e, data);
+	}
 };
 
 export const radmonAlpha = (number) => {
@@ -57,7 +57,7 @@ export const sendSMS = async ({ dialCode, phone, invitationCode }) => {
 		const flowId = "62cec8b74b9314686017b592";
 		let result;
 		if (dialCode == "91") {
-			result = await sendIndiaSMS(flowId, phone, {
+			result = await sendIndiaSMS(flowId, `${dialCode}${phone}`, {
 				invitationCode,
 				appLink,
 			});
