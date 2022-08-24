@@ -1,0 +1,7 @@
+ProdSectionNameIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+  Resource:
+    - "arn:aws:dynamodb:${self:custom.region.prod}:*:table/${self:provider.environment.PROD_SECTION_NAME_TABLE}"

@@ -15,13 +15,16 @@ provider:
 
   environment:
     SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
+    PROD_SECTION_NAME_TABLE: SectionNameTable-staging
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
     STAGE: ${sls:stage}
+    PROD_REGION: ${self:custom.region.prod}
   iam:
     role:
       statements:
         - ${file(iam/SectionNameIAM.yml):SectionNameIAM}
         - ${file(iam/LambdaInvokeIAM.yml):LambdaInvokeIAM}
+        - ${file(iam/ProdSectionNameIAM.yml):ProdSectionNameIAM}
 resources:
   Resources:
     SectionNameTable: ${file(resources/SectionNameTable.yml):SectionNameTable}
@@ -76,6 +79,13 @@ functions:
           method: GET
           path: /onboarding
           cors: true
+  copyRozyToProd:
+    handler: src/handlers/CopyRozyToProd.handler
+    events:
+      - http:
+          method: POST
+          path: /copyRozyToProd
+          cors: true
 
 custom:
   SectionNameTable: "SectionNameTable-${sls:stage}"
@@ -89,7 +99,7 @@ custom:
     dev: eu-central-1
     testing: ap-southeast-1
     staging: ap-southeast-1
-    prod: ap-south-1
+    prod: ap-southeast-1
 
   accessControlAllowOrigin:
     dev: "*"
