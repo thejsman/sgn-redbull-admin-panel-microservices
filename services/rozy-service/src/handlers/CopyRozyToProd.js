@@ -6,7 +6,7 @@ import createError from "http-errors";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
 const dynamoDBProd = new AWS.DynamoDB.DocumentClient({
-  region: process.env.PROD_REGION,
+  region: process.env.TRANSFER_TO_REGION,
 });
 
 async function CopyRozyToProd(event, context) {
@@ -31,12 +31,12 @@ async function CopyRozyToProd(event, context) {
     let rozyDataToCopy = await dynamoDb.query(params).promise();
     if (rozyDataToCopy.Items.length > 0) {
       //copy this data to prod environment
-      let result = await Promise.all(
+      await Promise.all(
         rozyDataToCopy.Items.map(async (item) => {
           //insert this item into dynamoDB on prod environment
           return await dynamoDBProd
             .put({
-              TableName: process.env.PROD_SECTION_NAME_TABLE,
+              TableName: process.env.TRANSFER_TO_SECTION_NAME_TABLE,
               Item: item,
             })
             .promise();

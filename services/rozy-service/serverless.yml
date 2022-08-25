@@ -15,16 +15,16 @@ provider:
 
   environment:
     SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
-    PROD_SECTION_NAME_TABLE: SectionNameTable-staging
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
     STAGE: ${sls:stage}
-    PROD_REGION: ${self:custom.region.prod}
+    TRANSFER_TO_REGION: ${self:custom.region.${self:custom.dataTransferredFromTo.${sls:stage}}}
+    TRANSFER_TO_SECTION_NAME_TABLE: SectionNameTable-${self:custom.dataTransferredFromTo.${sls:stage}}
   iam:
     role:
       statements:
         - ${file(iam/SectionNameIAM.yml):SectionNameIAM}
         - ${file(iam/LambdaInvokeIAM.yml):LambdaInvokeIAM}
-        - ${file(iam/ProdSectionNameIAM.yml):ProdSectionNameIAM}
+        - ${file(iam/TranferToSectionNameIAM.yml):TranferToSectionNameIAM}
 resources:
   Resources:
     SectionNameTable: ${file(resources/SectionNameTable.yml):SectionNameTable}
@@ -106,6 +106,10 @@ custom:
     testing: "*"
     staging: "*.sagoon.com"
     prod: "*.sagoon.com"
+
+  dataTransferredFromTo:
+    dev: staging
+    staging: prod
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
