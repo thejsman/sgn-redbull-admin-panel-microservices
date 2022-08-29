@@ -3,7 +3,7 @@ import { responseHandler } from "../lib/response";
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-const relationshipQuery = async (event, context) => {
+const appUserQuery = async (event, context) => {
 	try {
 		let params = {
 			TableName: process.env.APPUSER_TABLE_NAME,
@@ -36,4 +36,4 @@ const relationshipQuery = async (event, context) => {
 	}
 };
 
-export const handler = relationshipQuery;
+export const handler = appUserQuery;
