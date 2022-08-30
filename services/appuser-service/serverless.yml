@@ -44,7 +44,7 @@ functions:
 
 custom:
   AppUserTableName: UserTable-${sls:stage}
-  commonMiddlewareLayerVersion: 1.0.0
+  commonMiddlewareLayerVersion: "9"
 
   domains:
     dev: dev.sagoonlite.com
