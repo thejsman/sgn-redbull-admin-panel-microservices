@@ -1,0 +1,7 @@
+InvokeLambdaIAM:
+  Effect: "Allow"
+  Action:
+    - lambda:InvokeFunction
+    - lambda:invokeasync
+  Resource:
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:function:*
