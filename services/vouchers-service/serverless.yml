@@ -66,7 +66,14 @@ functions:
     handler: src/handlers/processPendingVouchers.handler
     events:
       - schedule: rate(${self:custom.cronTime.${sls:stage}})
-
+  bulkUpdate:
+    handler: src/handlers/bulkUpdate.handler
+    timeout: 30
+    events:
+      - http:
+          method: PATCh
+          path: /bulkUpdate
+          cors: true
 custom:
   VoucherTableName: VoucherTable-${sls:stage}
 

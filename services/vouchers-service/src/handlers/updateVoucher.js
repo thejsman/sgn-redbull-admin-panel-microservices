@@ -1,30 +1,28 @@
 /*eslint new-cap: ["error", { "newIsCap": false }]*/
-const AWS = require("aws-sdk");
 const { responseHandler } = require("../lib/response");
 import commonMiddleware from "../../../../packages/common-middleware";
-
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+import { updateVoucherStatus, updateVoucherVoucherStatus, getSingleVoucher } from "../lib/voucherHelper";
+// const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const updateVoucher = async (event, context) => {
 	// const timestamp = new Date().getTime();
 	const data = event.body;
-	let params = {};
-	params = {
-		TableName: process.env.VOUCHER_TABLE_NAME,
-		Key: {
-			pk: data.pk,
-			couponVoucherId: data.couponVoucherId,
-		},
-		ExpressionAttributeNames: {
-			"#status": "status",
-		},
-		ExpressionAttributeValues: {
-			":status": data.status,
-		},
-		UpdateExpression: "SET #status = :status",
-		ReturnValues: "ALL_NEW",
-	};
 	try {
-		let updateData = await dynamoDb.update(params).promise();
+		let updateData;
+		if (data.status) {
+			updateData = await updateVoucherStatus(data);
+		}
+		else if (data.voucherStatus) {
+			let allVouchers = await getSingleVoucher({ ...data, limit: 10000 });
+			for (let i = 0; i < allVouchers.Items.length; i++) {
+				updateData = await updateVoucherVoucherStatus({ ...allVouchers.Items[i], voucherStatus: data.voucherStatus });
+			}
+		} else {
+			return responseHandler({
+				statusCode: 400,
+				message: "Bad Request",
+				data: {},
+			});
+		}
 		return responseHandler({
 			statusCode: 200,
 			message: "Voucher has been Updated",

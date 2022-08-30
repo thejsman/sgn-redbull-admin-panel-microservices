@@ -17,6 +17,10 @@ VoucherTable:
         AttributeType: S
       - AttributeName: updatedAt
         AttributeType: S
+      - AttributeName: voucherStatus
+        AttributeType: S
+      - AttributeName: country
+        AttributeType: S                  
     KeySchema:
       - AttributeName: pk
         KeyType: HASH
@@ -68,5 +72,13 @@ VoucherTable:
             KeyType: RANGE
         Projection:
           ProjectionType: "ALL"
+      - IndexName: country-voucherStatus-Index
+        KeySchema:
+          - AttributeName: country
+            KeyType: HASH
+          - AttributeName: voucherStatus
+            KeyType: RANGE            
+        Projection:
+          ProjectionType: "ALL"          
     BillingMode: PAY_PER_REQUEST
     TableName: ${self:custom.VoucherTableName}

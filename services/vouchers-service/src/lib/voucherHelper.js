@@ -18,10 +18,22 @@ export const createVoucher = async (voucher) => {
 		.promise();
 };
 
+
 export const voucherList = async (data) => {
 	let params = {
 		TableName: process.env.VOUCHER_TABLE_NAME,
 		Limit: +data.limit,
+		IndexName: "country-voucherStatus-Index",
+		KeyConditionExpression: "#country = :country and #voucherStatus = :voucherStatus",
+		ExpressionAttributeNames: {
+			"#country": "country",
+			"#voucherStatus": "voucherStatus",
+		},
+		ExpressionAttributeValues: {
+			":country": data.country,
+			":voucherStatus": data.voucherStatus,
+		},
+
 	};
 	if (data.pk !== "null") {
 		params = {
@@ -32,6 +44,30 @@ export const voucherList = async (data) => {
 			},
 		};
 	}
+
+	try {
+		return await dynamodb.query(params).promise();
+	} catch (error) {
+		console.log("error", error);
+		throw error;
+	}
+};
+
+
+export const voucherScan = async (data) => {
+	let params = {
+		TableName: process.env.VOUCHER_TABLE_NAME,
+		Limit: +data.limit,
+	};
+	// if (data.pk !== "null") {
+	// 	params = {
+	// 		...params,
+	// 		ExclusiveStartKey: {
+	// 			pk: data.pk,
+	// 			couponVoucherId: data.couponVoucherId,
+	// 		},
+	// 	};
+	// }
 
 	try {
 		return await dynamodb.scan(params).promise();
@@ -91,3 +127,89 @@ export const getVoucherByVoucherId = async (data) => {
 		throw error;
 	}
 };
+
+
+export const bulkUpdateVouchers = async (data) => {
+	let params = {};
+	params = {
+		TableName: process.env.VOUCHER_TABLE_NAME,
+		Key: {
+			pk: data.pk,
+			couponVoucherId: data.couponVoucherId,
+		},
+		ReturnValues: "ALL_NEW",
+	};
+
+	params = {
+		...params,
+		ExpressionAttributeNames: {
+			"#country": "country",
+			"#voucherStatus": "voucherStatus",
+		},
+		ExpressionAttributeValues: {
+			":country": "India",
+			":voucherStatus": "notArchived",
+		},
+		UpdateExpression: "SET #country = :country, #voucherStatus = :voucherStatus",
+	};
+	// console.log("params", params);
+	try {
+		let updateData = await dynamodb.update(params).promise();
+		return updateData;
+	} catch (error) {
+		throw error;
+	}
+};
+
+
+export const updateVoucherStatus = async (data) => {
+	let params = {
+		TableName: process.env.VOUCHER_TABLE_NAME,
+		Key: {
+			pk: data.pk,
+			couponVoucherId: data.couponVoucherId,
+		},
+		ExpressionAttributeNames: {
+			"#status": "status",
+		},
+		ExpressionAttributeValues: {
+			":status": data.status,
+		},
+		UpdateExpression: "SET #status = :status",
+		ReturnValues: "ALL_NEW",
+	};
+	// console.log("params", params);
+	try {
+		let updateData = await dynamodb.update(params).promise();
+		return updateData;
+	} catch (error) {
+		throw error;
+	}
+};
+
+
+export const updateVoucherVoucherStatus = async (data) => {
+	let params = {
+		TableName: process.env.VOUCHER_TABLE_NAME,
+		Key: {
+			pk: data.pk,
+			couponVoucherId: data.couponVoucherId,
+		},
+		ExpressionAttributeNames: {
+			"#voucherStatus": "voucherStatus",
+		},
+		ExpressionAttributeValues: {
+			":voucherStatus": data.voucherStatus,
+		},
+		UpdateExpression: "SET #voucherStatus = :voucherStatus",
+		ReturnValues: "ALL_NEW",
+	};
+	// console.log("params", params);
+	try {
+		let updateData = await dynamodb.update(params).promise();
+		return updateData;
+	} catch (error) {
+		throw error;
+	}
+};
+

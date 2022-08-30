@@ -7,7 +7,7 @@ import { v4 as uuid } from "uuid";
 
 const addVoucher = async (event, context) => {
 	try {
-		const { itemId, variantId, validTill, coupon, productName, value } =
+		const { itemId, variantId, validTill, coupon, productName, value,country } =
 			event.body;
 		let couponSplit = coupon.split(",");
 		for (let i = 0; i < couponSplit.length; i++) {
@@ -25,6 +25,8 @@ const addVoucher = async (event, context) => {
 				couponPin,
 				productName,
 				value,
+				country,
+				voucherStatus:"notArchived"
 			};
 			await createVoucher(voucher);
 		}
