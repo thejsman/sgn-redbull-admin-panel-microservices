@@ -1,38 +1,23 @@
-import AWS from "aws-sdk";
 import { responseHandler } from "../lib/response";
-
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+import { getUserList } from "../lib/utils";
+import { commonMiddleware } from "common-middleware-layer";
 
 const listAppUsers = async (event, context) => {
   try {
-    let params = {
-      TableName: process.env.APPUSER_TABLE_NAME,
-      Limit: +data.limit,
-    };
-    if (data.userId !== "null") {
-      params = {
-        ...params,
-        ExclusiveStartKey: {
-          userId: data.userId,
-        },
-      };
-    }
-
-    let getData = await dynamoDb.scan(params).promise();
-    let responseData = responseHandler({
+    const { userId = null, limit = 10 } = event.queryStringParameters || {};
+    let response = await getUserList({ userId: userId, limit: limit });
+    return responseHandler({
       statusCode: 200,
       message: "App User Info",
-      data: getData,
+      data: response,
     });
-    return responseData;
   } catch (error) {
-    let responseData = responseHandler({
+    return responseHandler({
       statusCode: 502,
       message: "Error in Getting App User Info",
-      data: {},
+      data: [],
     });
-    return responseData;
   }
 };
 
-export const handler = listAppUsers;
+export const handler = commonMiddleware(listAppUsers);

@@ -1,22 +1,24 @@
-// import { responseHandler } from "../lib/response";
-
+import { responseHandler } from "../lib/response";
 import { findUserByPartitionKey, getUserInformation } from "../lib/utils";
 import { commonMiddleware } from "common-middleware-layer";
 
-const getOneAppUser = async (event, context) => {
+const getAppUser = async (event, context) => {
   const data = event.queryStringParameters;
-
   try {
-    const { userId = null, partitionKey = null } = event.body || {};
-
+    const { userId = null, mobileNO = null } = event.queryStringParameters || {};
     const user = {};
     if (userId) {
       user = await getUserInformation(userId);
     } else {
-      user = await findUserByPartitionKey(partitionKey);
+      user = await findUserByPartitionKey(mobileNO);
     }
-
     console.log({ user });
+    return responseHandler({
+      statusCode: 200,
+      message: "User Information",
+      data: user
+    });
+
   } catch (error) {
     let responseData = responseHandler({
       statusCode: 502,
@@ -27,4 +29,4 @@ const getOneAppUser = async (event, context) => {
   }
 };
 
-export const handler = commonMiddleware(getOneAppUser);
+export const handler = commonMiddleware(getAppUser);

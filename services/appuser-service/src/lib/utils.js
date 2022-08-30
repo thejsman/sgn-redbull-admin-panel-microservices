@@ -5,23 +5,21 @@ export const findUserByPartitionKey = async (partitionKey) => {
   const result = await dynamoDb
     .query({
       TableName: process.env.APPUSER_TABLE_NAME,
-      IndexName: "pkIndex",
-      KeyConditionExpression: "#pk = :pk",
+      KeyConditionExpression: "#phone = :phone",
       ExpressionAttributeNames: {
-        "#pk": "pk",
+        "#phone": "phone",
       },
       ExpressionAttributeValues: {
-        ":pk": partitionKey,
+        ":phone": partitionKey,
       },
-      //   ProjectionExpression:
-      //     "userId, currencySymbol, pk, phone, dialCode, totalRewards, totalRewardEarned, totalRewardUsed, email, emailVerified, dob, gender, profileImage, screenName",
     })
     .promise();
 
-  if (result.Items.length === 0) {
-    return false;
+  if (result.Item) {
+    return result.Item;
+  } else {
+    return {};
   }
-  return result.Items[0];
 };
 
 export const getUserInformation = async (userId) => {
@@ -30,8 +28,6 @@ export const getUserInformation = async (userId) => {
       .get({
         TableName: process.env.APPUSER_TABLE_NAME,
         Key: { userId },
-        // ProjectionExpression:
-        //   "userId, currencySymbol, pk, phone, dialCode, email, totalRewards, totalRewardEarned, totalRewardUsed, emailVerified, dob, gender, profileImage, screenName, lastPlayedAt",
       })
       .promise();
     if (result.Item) {
@@ -41,6 +37,39 @@ export const getUserInformation = async (userId) => {
     }
   } catch (error) {
     console.log("Exception in getUserInformation", error);
+    return {};
+  }
+};
+
+export const getUserList = async (data) => {
+  try {
+    let params = {
+      TableName: process.env.APPUSER_TABLE_NAME,
+      Limit: + data.limit,
+    };
+    if (data.userId !== "null") {
+      params = {
+        ...params,
+        ExclusiveStartKey: {
+          userId: data.userId,
+        },
+      };
+    }
+
+    let getData = await dynamoDb.scan(params).promise();
+    const result = await dynamoDb
+      .get({
+        TableName: process.env.APPUSER_TABLE_NAME,
+        Key: { userId },
+      })
+      .promise();
+    if (result.Item) {
+      return result.Item;
+    } else {
+      return {};
+    }
+  } catch (error) {
+    console.log("Exception in getUserList", error);
     return {};
   }
 };
