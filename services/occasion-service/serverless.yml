@@ -19,7 +19,11 @@ provider:
     LOTTIE_BACKGROUND_IMAGE_FOLDER: ${self:custom.bucket.${sls:stage}}/home-screen/lottie
     CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
-
+    OCCASION_ICONS_CLONED_FOLDER: ${env:upload_folder_${self:custom.dataTransferredFromTo.${sls:stage}}}
+    CDN_BUCKET_URL_UPPER_STAGE: ${env:s3_cdn_for_${self:custom.dataTransferredFromTo.${sls:stage}}}
+    BUCKET_TO_BE_IN_CLONE_UPPER_STAGE: ${self:custom.bucket.${self:custom.dataTransferredFromTo.${sls:stage}}}
+    REGION_IN_WHICH_TO_BE_COPIED: ${self:custom.region.${self:custom.dataTransferredFromTo.${sls:stage}}}
+    UPPER_STAGE_OCCASION_CARD_TABLE: ${self.custom.UpperStageOccasionCardTable}
   iam:
     role:
       statements:
@@ -68,6 +72,13 @@ functions:
       - http:
           method: GET
           path: /occasion
+          cors: true
+  cloneOccasions:
+    handler: src/handlers/SyncOccasionToUpperRegion.handler
+    events:
+      - http:
+          method: POST
+          path: /cloneOccasion
           cors: true
   AddOccasion:
     handler: src/handlers/AddOccasion.handler
@@ -129,6 +140,7 @@ custom:
   OccasionIconTable: "OccasionIconTable-${sls:stage}"
   OccasionTemplatesTable: "OccasionTemplatesTable-${sls:stage}"
   OccasionCardTable: "OccasionCardsTable-${sls:stage}"
+  UpperStageOccasionCardTable: OccasionCardsTable-${self:custom.dataTransferredFromTo.${sls:stage}}
   S3Bucket: "sagoon-2022-dev"
 
   domains:
@@ -154,6 +166,10 @@ custom:
     testing: "*"
     staging: "*.sagoon.com"
     prod: "*"
+
+  dataTransferredFromTo:
+    dev: staging
+    staging: prod
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
