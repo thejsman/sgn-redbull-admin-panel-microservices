@@ -7,9 +7,15 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3({
   region: process.env.REGION_IN_WHICH_TO_BE_COPIED,
 });
+const dynamoDBProd = new AWS.DynamoDB.DocumentClient({
+  region: process.env.REGION_IN_WHICH_TO_BE_COPIED,
+});
 
 async function SyncOccasionToUpperRegion(event, context) {
   try {
+    console.log(
+      `arn:aws:dynamodb:${process.env.REGION_IN_WHICH_TO_BE_COPIED}:*:table/${process.env.UPPER_STAGE_OCCASION_CARD_TABLE}`
+    );
     //first get the card identifier and card namr from body
     const { cardGroup, cardName } = event.body;
     let fileKey = "";
@@ -58,10 +64,10 @@ async function SyncOccasionToUpperRegion(event, context) {
     //Now we have the complete card detail to be copied
     console.log("cardDetails ----", cardDetails);
     //Now save this data to upper stage database
-    await dynamoDb
+    await dynamoDBProd
       .put({
         TableName: process.env.UPPER_STAGE_OCCASION_CARD_TABLE,
-        Item: cardDetails,
+        Item: { ...cardDetails.Item },
       })
       .promise();
     return response(200, { message: "Success" });

@@ -23,7 +23,7 @@ provider:
     CDN_BUCKET_URL_UPPER_STAGE: ${env:s3_cdn_for_${self:custom.dataTransferredFromTo.${sls:stage}}}
     BUCKET_TO_BE_IN_CLONE_UPPER_STAGE: ${self:custom.bucket.${self:custom.dataTransferredFromTo.${sls:stage}}}
     REGION_IN_WHICH_TO_BE_COPIED: ${self:custom.region.${self:custom.dataTransferredFromTo.${sls:stage}}}
-    UPPER_STAGE_OCCASION_CARD_TABLE: ${self.custom.UpperStageOccasionCardTable}
+    UPPER_STAGE_OCCASION_CARD_TABLE: ${self:custom.UpperStageOccasionCardTable}
   iam:
     role:
       statements:
@@ -31,6 +31,7 @@ provider:
         - ${file(iam/OccasionIconIAM.yml):OccasionIconIAM}
         - ${file(iam/OccasionTemplatesIAM.yml):OccasionTemplatesIAM}
         - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
+        - ${file(iam/TransferToOccasionCardIAM.yml):TransferToOccasionCardIAM}
 resources:
   Resources:
     OccasionCardTable: ${file(resources/OccasionCardTable.yml):OccasionCardTable}
