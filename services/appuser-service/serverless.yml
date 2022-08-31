@@ -1,0 +1,71 @@
+service: appuser-service
+useDotenv: true
+frameworkVersion: '3'
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.region.${sls:stage}}
+
+  environment:
+      REGION: ${self:provider.region}
+      APPUSER_TABLE_NAME: UserTable-${sls:stage}
+      ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
+
+  iam:
+      role:
+        statements:
+          - ${file(iam/AppUserTableIAM.yml):AppUserTableIAM}
+          - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+      
+functions:
+  getOneAppUser:
+    handler: src/handlers/getOne.handler
+    events:
+      - http:
+          method: GET
+          path: /appuser/getOne
+          cors: true
+  queryAppUser:
+    handler: src/handlers/query.handler
+    events:
+      - http:
+          method: GET
+          path: /appuser/query
+          cors: true
+
+
+custom:
+  AppUserTableName: UserTable-${sls:stage}
+
+  domains:
+    dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*"
+    prod: "*"
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: appUser
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge
