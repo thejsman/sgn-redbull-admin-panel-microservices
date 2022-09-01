@@ -8,7 +8,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs16.x
+  runtime: nodejs14.x
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: ${self:custom.region.${sls:stage}}
@@ -18,13 +18,18 @@ provider:
   environment:
     REGION: ${self:provider.region}
     APPUSER_TABLE_NAME: UserTable-${sls:stage}
+    TRANSACTION_TABLE_NAME: TransactionsTable-${sls:stage}
+    USER_REWARDS_TABLE_NAME: UserRewardsTable-${sls:stage}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
+    CONNECTION_TABLE_NAME: ConnectionTable-${sls:stage}
 
   iam:
     role:
       statements:
         - ${file(iam/AppUserTableIAM.yml):AppUserTableIAM}
-        # - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/TransactionsTableIAM.yml):TransactionsTableIAM}
+        - ${file(iam/UserRewardsTableIAM.yml):UserRewardsTableIAM}
+        - ${file(iam/ConnectionsTableIAM.yml):ConnectionsTableIAM}
 
 functions:
   getAppUser:
@@ -41,10 +46,38 @@ functions:
           method: GET
           path: /users
           cors: true
+  getTransactionsByAppUserId:
+    handler: src/handlers/getTransactionsByAppUserId.handler
+    events:
+      - http:
+          method: GET
+          path: /transactions
+          cors: true
+  getRewardsByAppUserId:
+    handler: src/handlers/getRewardsByAppUserId.handler
+    events:
+      - http:
+          method: GET
+          path: /rewards
+          cors: true
+  getConnectionsByAppUserId:
+    handler: src/handlers/getConnectionsByAppUserId.handler
+    events:
+      - http:
+          method: GET
+          path: /connections
+          cors: true
 
 custom:
-  AppUserTableName: UserTable-${sls:stage}
-  commonMiddlewareLayerVersion: "9"
+  # AppUserTableName: UserTable-${sls:stage}
+  # TransactionsTableName: TransactionsTable-${sls:stage}
+  # UserRewardsTableNAME: UserRewardsTable-${sls:stage}
+  # ConnectionTableName: ConnectionTable-${sls:stage}
+
+  commonMiddlewareLayerVersion:
+    dev: 9
+    staging: 1
+    prod: 1
 
   domains:
     dev: dev.sagoonlite.com

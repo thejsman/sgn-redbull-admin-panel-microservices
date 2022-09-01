@@ -1,16 +1,15 @@
 import { responseHandler } from "../lib/response";
-import { findUserByPartitionKey, getUserInformation } from "../lib/utils";
-import { commonMiddleware } from "common-middleware-layer";
+import { getUserByPhoneNo, getUserInformation } from "../lib/utils";
+//import commonMiddleware from "../../../../packages/common-middleware";
 
 const getAppUser = async (event, context) => {
-  const data = event.queryStringParameters;
   try {
-    const { userId = null, mobileNO = null } = event.queryStringParameters || {};
-    const user = {};
+    const { userId = null, phone = null } = event.queryStringParameters || {};
+    let user = {};
     if (userId) {
       user = await getUserInformation(userId);
     } else {
-      user = await findUserByPartitionKey(mobileNO);
+      user = await getUserByPhoneNo(phone);
     }
     console.log({ user });
     return responseHandler({
@@ -29,4 +28,5 @@ const getAppUser = async (event, context) => {
   }
 };
 
-export const handler = commonMiddleware(getAppUser);
+//export const handler = commonMiddleware(getAppUser);
+export const handler = getAppUser;

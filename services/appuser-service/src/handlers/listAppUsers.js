@@ -1,6 +1,6 @@
 import { responseHandler } from "../lib/response";
 import { getUserList } from "../lib/utils";
-import { commonMiddleware } from "common-middleware-layer";
+//import commonMiddleware from "../../../../packages/common-middleware";
 
 const listAppUsers = async (event, context) => {
   try {
@@ -20,4 +20,5 @@ const listAppUsers = async (event, context) => {
   }
 };
 
-export const handler = commonMiddleware(listAppUsers);
+//export const handler = commonMiddleware(listAppUsers);
+export const handler = listAppUsers;
