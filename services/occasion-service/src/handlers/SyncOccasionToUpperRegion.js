@@ -13,9 +13,6 @@ const dynamoDBProd = new AWS.DynamoDB.DocumentClient({
 
 async function SyncOccasionToUpperRegion(event, context) {
   try {
-    console.log(
-      `arn:aws:dynamodb:${process.env.REGION_IN_WHICH_TO_BE_COPIED}:*:table/${process.env.UPPER_STAGE_OCCASION_CARD_TABLE}`
-    );
     //first get the card identifier and card namr from body
     const { cardGroup, cardName } = event.body;
     let fileKey = "";
@@ -61,8 +58,6 @@ async function SyncOccasionToUpperRegion(event, context) {
         cardDetails.Item.lottie.lottieGraphicFileName = `${process.env.CDN_BUCKET_URL_UPPER_STAGE}${fileKey}`;
       }
     }
-    //Now we have the complete card detail to be copied
-    console.log("cardDetails ----", cardDetails);
     //Now save this data to upper stage database
     await dynamoDBProd
       .put({
