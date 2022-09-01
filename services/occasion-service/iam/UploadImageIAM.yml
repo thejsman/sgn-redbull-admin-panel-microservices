@@ -5,4 +5,4 @@ UploadImageIAM:
     - s3:CopyObject
   Resource:
     - arn:aws:s3:::${self:custom.bucket.${sls:stage}}/*
-    - arn:aws:s3:::sagoon-staging/*
+    - arn:aws:s3:::${self:custom.bucket.${self:custom.dataTransferredFromTo.${sls:stage}}}/*
