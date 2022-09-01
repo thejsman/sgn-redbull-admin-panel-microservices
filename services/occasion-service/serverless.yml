@@ -79,7 +79,7 @@ functions:
     events:
       - http:
           method: POST
-          path: /cloneOccasion
+          path: /cloneOccasionCard
           cors: true
   AddOccasion:
     handler: src/handlers/AddOccasion.handler
