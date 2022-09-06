@@ -15,9 +15,8 @@ const getAppUser = async (event, context) => {
     return responseHandler({
       statusCode: 200,
       message: "User Information",
-      data: user
+      data: user,
     });
-
   } catch (error) {
     let responseData = responseHandler({
       statusCode: 502,

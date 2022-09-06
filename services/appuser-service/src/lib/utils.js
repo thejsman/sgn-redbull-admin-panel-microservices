@@ -6,8 +6,7 @@ export const getUserByPhoneNo = async (phone) => {
     let params = {
       TableName: process.env.APPUSER_TABLE_NAME,
       IndexName: "pkIndex",
-      KeyConditionExpression:
-        "#pk = :pk",
+      KeyConditionExpression: "#pk = :pk",
       ExpressionAttributeNames: {
         "#pk": "pk",
       },
@@ -46,11 +45,14 @@ export const getUserInformation = async (userId) => {
   }
 };
 
+//@shipra - we never use scan operation, instead of that we can get on the partition key and sort key
+// this has to be a paginated query, so you have to implement continuation token and use LastEvaluatedKey and ExclusiveStartKey
+// for this we will add few more GSI's and will let you know which one to use
 export const getUserList = async (data) => {
   try {
     let params = {
       TableName: process.env.APPUSER_TABLE_NAME,
-      Limit: + data.limit,
+      Limit: +data.limit,
     };
     // if (data.userId !== "null") {
     //   params = {
@@ -61,9 +63,9 @@ export const getUserList = async (data) => {
     //   };
     // }
 
-    console.log('params', params);
+    console.log("params", params);
     let result = await dynamoDb.scan(params).promise();
-    console.log('result', result);
+    console.log("result", result);
     if (result.Items) {
       return result.Items;
     } else {
@@ -80,8 +82,7 @@ export const getTransactionsByUserId = async (data) => {
     let params = {
       TableName: process.env.TRANSACTION_TABLE_NAME,
       Limit: +data.limit,
-      KeyConditionExpression:
-        "#userId = :userId",
+      KeyConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: {
         "#userId": "userId",
       },
@@ -95,7 +96,7 @@ export const getTransactionsByUserId = async (data) => {
         ...params,
         ExclusiveStartKey: {
           userId: data.userId,
-          transactionId: data.transactionId
+          transactionId: data.transactionId,
         },
       };
     }
@@ -106,13 +107,11 @@ export const getTransactionsByUserId = async (data) => {
   }
 };
 
-
 export const getRewardsByUserId = async (userId) => {
   try {
     let params = {
       TableName: process.env.USER_REWARDS_TABLE_NAME,
-      KeyConditionExpression:
-        "#userId = :userId",
+      KeyConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: {
         "#userId": "userId",
       },
@@ -120,7 +119,6 @@ export const getRewardsByUserId = async (userId) => {
         ":userId": userId,
       },
     };
-
 
     return await dynamoDb.query(params).promise();
   } catch (error) {
@@ -133,8 +131,7 @@ export const getConnectionsByUserId = async (userId) => {
     let params = {
       TableName: process.env.CONNECTION_TABLE_NAME,
       IndexName: "subFrom_status-Index",
-      KeyConditionExpression:
-        "#subFrom = :subFrom",
+      KeyConditionExpression: "#subFrom = :subFrom",
       ExpressionAttributeNames: {
         "#subFrom": "subFrom",
       },
