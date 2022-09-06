@@ -21,6 +21,5 @@ const getConnectionsByAppUserId = async (event, context) => {
   }
 };
 
-
 // export const handler = commonMiddleware(getConnectionsByAppUserId);
 export const handler = getConnectionsByAppUserId;

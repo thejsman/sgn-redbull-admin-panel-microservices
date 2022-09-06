@@ -21,6 +21,5 @@ const getRewardsByAppUserId = async (event, context) => {
   }
 };
 
-
 // export const handler = commonMiddleware(getRewardsByAppUserId);
 export const handler = getRewardsByAppUserId;

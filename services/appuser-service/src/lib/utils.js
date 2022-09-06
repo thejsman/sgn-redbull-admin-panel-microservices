@@ -77,6 +77,7 @@ export const getUserList = async (data) => {
   }
 };
 
+// @shipra - please use ScanIndexForward: false/true to get transactions sorted by createdAt
 export const getTransactionsByUserId = async (data) => {
   try {
     let params = {
@@ -107,6 +108,7 @@ export const getTransactionsByUserId = async (data) => {
   }
 };
 
+// @shipra - please use ScanIndexForward: false/true to get rewards sorted by createdAt
 export const getRewardsByUserId = async (userId) => {
   try {
     let params = {

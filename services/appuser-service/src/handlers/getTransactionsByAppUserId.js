@@ -8,7 +8,7 @@ const getTransactionsByAppUserId = async (event, context) => {
     let transactionObject = {
       limit: limit ? +limit : 5,
       userId,
-      transactionId
+      transactionId,
     };
     let result = await getTransactionsByUserId(transactionObject);
     return responseHandler({
@@ -25,7 +25,6 @@ const getTransactionsByAppUserId = async (event, context) => {
     });
   }
 };
-
 
 //export const handler = commonMiddleware(getTransactionsByAppUserId);
 export const handler = getTransactionsByAppUserId;
