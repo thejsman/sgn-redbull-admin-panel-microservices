@@ -83,6 +83,7 @@ export const getTransactionsByUserId = async (data) => {
     let params = {
       TableName: process.env.TRANSACTION_TABLE_NAME,
       Limit: +data.limit,
+      ScanIndexForward: true,
       KeyConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: {
         "#userId": "userId",
@@ -113,6 +114,7 @@ export const getRewardsByUserId = async (userId) => {
   try {
     let params = {
       TableName: process.env.USER_REWARDS_TABLE_NAME,
+      ScanIndexForward: true,
       KeyConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: {
         "#userId": "userId",
