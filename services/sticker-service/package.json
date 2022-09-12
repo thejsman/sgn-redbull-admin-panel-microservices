@@ -1,8 +1,8 @@
 {
-	"name": "admin-family-service",
+	"name": "admin-sticker-service",
 	"version": "1.0.0",
-	"description": "Sagoon Auth Service",
-	"author": "NB",
+	"description": "Sagoon Sticker Service",
+	"author": "AR",
 	"license": "MIT",
 	"devDependencies": {
 		"babel-core": "^6.26.3",

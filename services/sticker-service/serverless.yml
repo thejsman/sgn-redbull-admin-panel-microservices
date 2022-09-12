@@ -15,7 +15,7 @@ provider:
 
   environment:
     REGION: ${self:provider.region}
-    STICKERS_TABLE_NAME: StickersTable-${sls:stage}
+    STICKERS_TABLE_NAME: StickerTable-${sls:stage}
     S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}/${env:upload_folder_${sls:stage}}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
     CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
@@ -90,7 +90,7 @@ custom:
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
-    basePath: stickers
+    basePath: sticker
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge
