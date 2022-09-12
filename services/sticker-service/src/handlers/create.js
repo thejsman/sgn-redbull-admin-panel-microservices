@@ -43,7 +43,6 @@ const createSticker = async (event, context) => {
           data.Location = process.env.CDN_BUCKET_URL + data.Key;
         }
         params.Item = { ...params.Item, icon: data.Location };
-        console.log(params, "ffffff", data);
       } catch (error) {
         console.log("erorr", error);
         return responseHandler({
