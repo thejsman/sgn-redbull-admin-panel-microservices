@@ -7,10 +7,8 @@ import axios from "axios";
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 export const saveMessage = async (message) => {
-	const timestamp = new Date().getTime();
 	const params = {
-		...message,
-		createdAt: timestamp,
+		...message
 	};
 	await dynamodb
 		.put({
@@ -22,7 +20,6 @@ export const saveMessage = async (message) => {
 
 export const getUsers = async (params = {}, data = []) => {
 	let getFilterUsers = await getUsersByCountryCodeAndCreatedDate(params);
-	console.log("getFilterUsers", getFilterUsers);
 	if (data && data.length) {
 		data = [...data, ...getFilterUsers.Items];
 	}
@@ -39,13 +36,11 @@ export const getUsers = async (params = {}, data = []) => {
 		return getUsers(paginationParams, data);
 	}
 	else {
-		console.log("dataaa", data.length);
 		return data;
 	}
 };
 
 const getUsersByCountryCodeAndCreatedDate = async (data) => {
-	console.log("dataaaaaa", data);
 	let params = {
 		TableName: process.env.USER_TABLE_NAME,
 		IndexName: "countryCode_createdDate-Index",
@@ -69,7 +64,6 @@ const getUsersByCountryCodeAndCreatedDate = async (data) => {
 			},
 		};
 	}
-	console.log("query", params);
 	try {
 		return await dynamodb.query(params).promise();
 	} catch (error) {

@@ -5,30 +5,37 @@ import { responseHandler } from "../lib/response";
 import { getTransactionsByTransactionId, updateTransaction } from "../lib/transactionsHelper";
 
 const updateTransactionDelivery = async (event, context) => {
-    const now = new Date();
     try {
-        const {transactionId} =JSON.parse(event.body);
-        console.log("ooooooooo",transactionId);
-
+        const { transactionId, deliveryDate } = JSON.parse(event.body);
         try {
             let data = await getTransactionsByTransactionId({ transactionId });
             if (data && data.Items.length) {
                 let transaction = data.Items[0];
                 let deliveryObject = {
                     ...transaction.deliveryObject,
-                    deliveryDate: now.toISOString(),
+                    deliveryDate: deliveryDate,
                     deliveryStatus: "DELIVERED",
                     deliverySubTitle: "Item delivered"
                 };
-                console.log("deliveryObject", deliveryObject);
-                await updateTransaction({ deliveryObject, transactionId ,userId:transaction.userId});
+                await updateTransaction({ deliveryObject, transactionId, userId: transaction.userId });
+                let response = responseHandler({
+                    statusCode: 200,
+                    message: "Transactions Object",
+                    data: data && data.Items.length ? data.Items[0] : {},
+                });
+                return response;
+
             }
-            let response = responseHandler({
-                statusCode: 200,
-                message: "Transactions Object",
-                data: data && data.Items.length ? data.Items[0] : {},
-            });
-            return response;
+            else {
+                let response = responseHandler({
+                    statusCode: 500,
+                    message: "Transactions Not Found",
+                    data: {},
+                });
+                return response;
+
+            }
+
         } catch (error) {
             console.log("error", error);
             return responseHandler({
