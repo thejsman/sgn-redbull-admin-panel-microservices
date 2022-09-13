@@ -151,10 +151,11 @@ export const getTransactionsStatusWise = async (data) => {
 };
 
 export const getTransactionsByTransactionId = async (data) => {
+	console.log("pppppppppp", data);
 	try {
 		let params = {
 			TableName: process.env.TRANSACTION_TABLE_NAME,
-			IndexName:"transactionId-Index",
+			IndexName: "transactionId-Index",
 			KeyConditionExpression:
 				"#transactionId = :transactionId",
 			ExpressionAttributeNames: {
@@ -169,6 +170,38 @@ export const getTransactionsByTransactionId = async (data) => {
 			},
 		};
 		return await dynamodb.query(params).promise();
+	} catch (error) {
+		throw error;
+	}
+};
+
+
+export const updateTransaction = async (data) => {
+	console.log("ddddddddddd", data);
+	let params = {};
+	params = {
+		TableName: process.env.TRANSACTION_TABLE_NAME,
+		Key: {
+			userId: data.userId,
+			transactionId: data.transactionId,
+		},
+		ReturnValues: "ALL_NEW",
+	};
+
+	params = {
+		...params,
+		ExpressionAttributeNames: {
+			"#deliveryObject": "deliveryObject"
+		},
+		ExpressionAttributeValues: {
+			":deliveryObject": data.deliveryObject,
+		},
+		UpdateExpression: "SET #deliveryObject = :deliveryObject",
+	};
+	// console.log("params", params);
+	try {
+		let updateData = await dynamodb.update(params).promise();
+		return updateData;
 	} catch (error) {
 		throw error;
 	}

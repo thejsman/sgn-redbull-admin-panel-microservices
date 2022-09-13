@@ -57,6 +57,13 @@ functions:
           method: GET
           path: /transaction/transactionId
           cors: true
+  updateTransactionDelivery:
+    handler: src/handlers/updateTransactionDelivery.handler
+    events:
+      - http:
+          method: PATCH
+          path: /transaction/updateDelivery
+          cors: true          
 custom:
   TransactionsTableName: TransactionsTable-${sls:stage}
   UserTableName: UserTable-${sls:stage}

@@ -1,0 +1,86 @@
+service: admin-message-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.region.${sls:stage}}
+
+  environment:
+    MESSAGE_TABLE_NAME: MessageTable-${sls:stage}
+    MESSAGE_SEND_QUEUE: https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/MessageSendQueue-${sls:stage}
+    USER_TABLE_NAME: UserTable-${sls:stage}
+
+  iam:
+    role:
+      statements:
+        - ${file(iam/MessageTableIAM.yml):MessageTableIAM}
+        - ${file(iam/UserTableIAM.yml):UserTableIAM}
+        - ${file(iam/MessageSendQueueIAM.yml):MessageSendQueueIAM}
+
+resources:
+  Resources:
+    MessageTable: ${file(resources/MessageTable.yml):MessageTable}
+    MessageSendQueue: ${file(resources/MessageSendQueue.yml):MessageSendQueue}
+
+
+functions:
+  sendMessage:
+    handler: src/handlers/createMessage.handler
+    events:
+      - http:
+          method: POST
+          path: /send
+          cors: true
+  sendMessageQueue:
+    handler: src/handlers/sendMessageQueue.handler
+    events:
+      - sqs:
+          arn: !GetAtt [MessageSendQueue, Arn]          
+
+custom:
+  MessageTableName: MessageTable-${sls:stage}
+  UserTableName: UserTable-${sls:stage}
+
+
+  domains:
+    dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  pendingVoucherTime:
+    dev: 90
+    staging: 90
+    prod: 5
+
+  cronTime:
+    dev: 3 hours
+    staging: 3 hours
+    prod: 5 minutes
+
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*.sagoon.com"
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: adminMessage
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge

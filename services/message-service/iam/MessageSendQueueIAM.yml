@@ -1,0 +1,7 @@
+MessageSendQueueIAM:
+  Effect: Allow
+  Action:
+    - sqs:ReceiveMessage
+    - sqs:SendMessage
+  Resource:
+    - arn:aws:sqs:${aws:region}:${aws:accountId}:MessageSendQueue-${sls:stage}
