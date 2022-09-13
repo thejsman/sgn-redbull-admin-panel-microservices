@@ -62,6 +62,13 @@ functions:
           method: GET
           path: /query
           cors: true
+  listSticker:
+    handler: src/handlers/list.handler
+    events:
+      - http:
+          method: GET
+          path: /list
+          cors: true
 custom:
   StickersTableName: StickersTableTable-${sls:stage}
 
