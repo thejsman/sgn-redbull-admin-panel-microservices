@@ -29,6 +29,7 @@ const createInvitationCode = async (event, context) => {
           countryCode: dialCode.replace("+", ""),
           firstName,
           lastName,
+          level: "S1",
         };
         if (bulk) {
           //in case of waitlisted users invitation code will be send and attempt count will be

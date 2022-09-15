@@ -4,7 +4,7 @@ AppUserTableIAM:
     - dynamodb:Query
     - dynamodb:GetItem
     - dynamodb:Scan
-   
+
   Resource:
-    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.AppUserTableName}"
-    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.AppUserTableName}/index/*"
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.APPUSER_TABLE_NAME}"
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.APPUSER_TABLE_NAME}/index/*"
