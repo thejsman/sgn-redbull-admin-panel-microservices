@@ -20,13 +20,21 @@ provider:
     INVITATION_TABLE_NAME: InvitationTable-${sls:stage}
     WAITLISTEDUSERS_TABLE_NAME: WaitlistedUsersTable-${sls:stage}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
-
+    USER_EXPORT_REQUEST_QUEUE: https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/userExportRequestQueue-${sls:stage}
+    BUCKET_FOR_WAITLISTED_USER_REPORT: ${self:custom.bucket.${sls:stage}}
+    CDN_URL_FOR_BUCKET: ${self:custom.cdnURLs.${sls:stage}}
   iam:
     role:
       statements:
         - ${file(iam/InvitationTableIAM.yml):InvitationTableIAM}
         - ${file(iam/WaitlistedUsersIAM.yml):WaitlistedUsersIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/userExportRequestQueueIAM.yml):userExportRequestQueueIAM}
+        - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
+        - ${file(iam/SendEmailIAM.yml):SendEmailIAM}
+resources:
+  Resources:
+    userExportRequestQueue: ${file(resources/userExportRequestQueue.yml):userExportRequestQueue}
 
 functions:
   createInvitationCode:
@@ -57,6 +65,18 @@ functions:
           method: DELETE
           path: /delete/{pk}
           cors: true
+  requestUserDataToExport:
+    handler: src/handlers/requestUserDataToExport.handler
+    events:
+      - http:
+          method: GET
+          path: /requestUserDataToExport
+          cors: true
+  processUserExportQueue:
+    handler: src/handlers/lambdaToProcessUserExportRequest.handler
+    events:
+      - sqs:
+          arn: !GetAtt [userExportRequestQueue, Arn]
 custom:
   InvitationTableName: InvitationTable-${sls:stage}
 
@@ -71,6 +91,18 @@ custom:
     testing: ap-southeast-1
     staging: ap-southeast-1
     prod: ap-south-1
+
+  bucket:
+    dev: sagoon-2022-dev
+    testing: sagoon-staging
+    staging: sagoon-staging
+    prod: sagoon-prod
+
+  cdnURLs:
+    dev: https://sagoon-2022-dev.s3.ap-south-1.amazonaws.com/
+    staging: https://sagoon-staging-cdn.sagoon.com/
+    prod: https://sagoon-prod-cdn.sagoon.com/
+    testing: https://sagoon-staging-cdn.sagoon.com/
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}

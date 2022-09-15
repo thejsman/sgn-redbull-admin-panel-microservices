@@ -1,7 +1,7 @@
 {
-	"name": "admin-invitation-service",
+	"name": "admin-connection-service",
 	"version": "1.0.0",
-	"description": "Sagoon Admin Invitation Service",
+	"description": "Sagoon Admin Connection Service",
 	"author": "NB",
 	"license": "MIT",
 	"devDependencies": {
@@ -22,7 +22,6 @@
 		"aws-sdk": "^2.1090.0",
 		"axios": "^0.26.1",
 		"http-errors": "^2.0.0",
-		"json2csv": "^5.0.7",
 		"jsonwebtoken": "^8.5.1",
 		"serverless-domain-manager": "^6.0.2",
 		"twilio": "^3.75.1",

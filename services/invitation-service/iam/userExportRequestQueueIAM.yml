@@ -1,0 +1,7 @@
+userExportRequestQueueIAM:
+  Effect: Allow
+  Action:
+    - sqs:ReceiveMessage
+    - sqs:SendMessage
+  Resource:
+    - Fn::GetAtt: [userExportRequestQueue, Arn]

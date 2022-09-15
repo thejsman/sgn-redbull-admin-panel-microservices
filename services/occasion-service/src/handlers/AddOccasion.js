@@ -37,6 +37,34 @@ async function AddOccasion(event, context) {
         data.occasionIcon = s3data.Location;
       }
     }
+    //Uploading userOccasionsLottiBackground also
+    if (
+      data.userLottiBackgroundIcon &&
+      data.userLottiBackgroundIcon.includes("application/json")
+    ) {
+      let type = data.userLottiBackgroundIcon.split(";")[0].split("/")[1];
+      let base64Data = Buffer.from(
+        data.userLottiBackgroundIcon.replace(
+          /^data:application\/\w+;base64,/,
+          ""
+        ),
+        "base64"
+      );
+      let s3Params = {
+        Bucket: process.env.LOTTIE_BACKGROUND_IMAGE_FOLDER,
+        Key: `${occasionName.toLowerCase()}.${type}`,
+        Body: base64Data,
+        ContentEncoding: "base64",
+        ContentType: type,
+      };
+      let s3data = await s3.upload(s3Params).promise();
+      console.log("s3data ---", s3data);
+      if (process.env.CDN_BUCKET_URL) {
+        data.userLottiBackgroundIcon = process.env.CDN_BUCKET_URL + s3data.Key;
+      } else {
+        data.userLottiBackgroundIcon = s3data.Location;
+      }
+    }
 
     let UpdateExpression = [];
     let ExpressionAttributeValues = {};

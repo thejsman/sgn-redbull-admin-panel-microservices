@@ -1,0 +1,7 @@
+TranferToSectionNameIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+  Resource:
+    - "arn:aws:dynamodb:${self:provider.environment.TRANSFER_TO_REGION}:*:table/${self:provider.environment.TRANSFER_TO_SECTION_NAME_TABLE}"
