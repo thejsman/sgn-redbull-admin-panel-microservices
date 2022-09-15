@@ -171,6 +171,7 @@ custom:
   dataTransferredFromTo:
     dev: staging
     staging: prod
+    prod: staging
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
