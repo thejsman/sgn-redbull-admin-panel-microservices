@@ -1,0 +1,103 @@
+service: admin-sticker-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.region.${sls:stage}}
+
+  environment:
+    REGION: ${self:provider.region}
+    STICKERS_TABLE_NAME: StickerTable-${sls:stage}
+    S3_BUCKET_NAME: ${self:custom.s3BucketName.${sls:stage}}/${env:upload_folder_${sls:stage}}
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
+    CDN_BUCKET_URL: ${env:s3_cdn_for_${sls:stage}}
+  iam:
+    role:
+      statements:
+        - ${file(iam/StickersTableIAM.yml):StickersTableIAM}
+        - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/UploadImageIAM.yml):UploadImageIAM}
+
+functions:
+  getOneSticker:
+    handler: src/handlers/getOne.handler
+    events:
+      - http:
+          method: GET
+          path: /getOne
+          cors: true
+  createSticker:
+    handler: src/handlers/create.handler
+    events:
+      - http:
+          method: POST
+          path: /create
+          cors: true
+  updateSticker:
+    handler: src/handlers/update.handler
+    events:
+      - http:
+          method: PUT
+          path: /update
+          cors: true
+  deleteSticker:
+    handler: src/handlers/delete.handler
+    events:
+      - http:
+          method: DELETE
+          path: /delete
+          cors: true
+  querySticker:
+    handler: src/handlers/query.handler
+    events:
+      - http:
+          method: GET
+          path: /query
+          cors: true
+  listSticker:
+    handler: src/handlers/list.handler
+    events:
+      - http:
+          method: GET
+          path: /list
+          cors: true
+custom:
+  StickersTableName: StickersTableTable-${sls:stage}
+
+  s3BucketName:
+    dev: sagoon-relationship-dev
+    staging: sagoon-staging
+    prod: sagoon-prod
+
+  domains:
+    dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*"
+    prod: "*"
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: sticker
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge

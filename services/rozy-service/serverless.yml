@@ -17,11 +17,14 @@ provider:
     SECTION_NAME_TABLE: ${self:custom.SectionNameTable}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self:custom.accessControlAllowOrigin.${sls:stage}}
     STAGE: ${sls:stage}
+    TRANSFER_TO_REGION: ${self:custom.region.${self:custom.dataTransferredFromTo.${sls:stage}}}
+    TRANSFER_TO_SECTION_NAME_TABLE: SectionNameTable-${self:custom.dataTransferredFromTo.${sls:stage}}
   iam:
     role:
       statements:
         - ${file(iam/SectionNameIAM.yml):SectionNameIAM}
         - ${file(iam/LambdaInvokeIAM.yml):LambdaInvokeIAM}
+        - ${file(iam/TranferToSectionNameIAM.yml):TranferToSectionNameIAM}
 resources:
   Resources:
     SectionNameTable: ${file(resources/SectionNameTable.yml):SectionNameTable}
@@ -76,6 +79,13 @@ functions:
           method: GET
           path: /onboarding
           cors: true
+  copyRozyToProd:
+    handler: src/handlers/CopyRozyToProd.handler
+    events:
+      - http:
+          method: POST
+          path: /copyRozyToProd
+          cors: true
 
 custom:
   SectionNameTable: "SectionNameTable-${sls:stage}"
@@ -89,13 +99,17 @@ custom:
     dev: eu-central-1
     testing: ap-southeast-1
     staging: ap-southeast-1
-    prod: ap-south-1
+    prod: ap-southeast-1
 
   accessControlAllowOrigin:
     dev: "*"
     testing: "*"
     staging: "*.sagoon.com"
     prod: "*.sagoon.com"
+
+  dataTransferredFromTo:
+    dev: staging
+    staging: prod
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}

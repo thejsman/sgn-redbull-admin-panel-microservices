@@ -1,7 +1,13 @@
 /*eslint new-cap: ["error", { "newIsCap": false }]*/
 
 import { responseHandler } from "../lib/response";
-import { saveInvitation, radmonAlpha, sendSMS } from "../lib/invitationHelper";
+import {
+  saveInvitation,
+  radmonAlpha,
+  sendSMS,
+  retrieveWaitlistedInfo,
+  updateWaitlistedUserInfo,
+} from "../lib/invitationHelper";
 
 const createInvitationCode = async (event, context) => {
   try {
@@ -23,7 +29,30 @@ const createInvitationCode = async (event, context) => {
           countryCode: dialCode.replace("+", ""),
           firstName,
           lastName,
+          level: "S1",
         };
+        if (bulk) {
+          //in case of waitlisted users invitation code will be send and attempt count will be
+          //stored in waitlisted user data
+          //first retrive current info if any for this user to increase the total attemps to send code
+          let waitlistedUserInfo = await retrieveWaitlistedInfo(
+            `${dialCode}${phone}`
+          );
+          if (waitlistedUserInfo.Item) {
+            waitlistedUserInfo = {
+              ...waitlistedUserInfo.Item,
+              codeSentInfo: {
+                invitationCode,
+                createdAt: new Date().toISOString(),
+                attempts: waitlistedUserInfo.Item.codeSentInfo
+                  ? waitlistedUserInfo.Item.codeSentInfo.attempts + 1
+                  : 1,
+              },
+            };
+          }
+          //update waitlisted user info with current attemps count increased by 1
+          await updateWaitlistedUserInfo(waitlistedUserInfo);
+        }
         await saveInvitation(invitationObject);
         let smsResult = await sendSMS({
           dialCode,
