@@ -18,6 +18,7 @@ provider:
     # SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
     REGION: ${self:provider.region}
     TRANSACTION_TABLE_NAME: TransactionsTable-${sls:stage}
+    GIFTS_TABLE_NAME: GiftsTable-${sls:stage}
     USER_TABLE_NAME: UserTable-${sls:stage}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
 
@@ -27,6 +28,7 @@ provider:
         - ${file(iam/UserTableIAM.yml):UserTableIAM}
         - ${file(iam/TransactionsTableIAM.yml):TransactionsTableIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/GiftsTableIAM.yml):GiftsTableIAM}
 
 functions:
   getTransactionsByDate:
@@ -67,6 +69,7 @@ functions:
 custom:
   TransactionsTableName: TransactionsTable-${sls:stage}
   UserTableName: UserTable-${sls:stage}
+  GiftsTableName: GiftsTable-${sls:stage}
 
   domains:
     dev: dev.sagoonlite.com

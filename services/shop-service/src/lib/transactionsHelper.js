@@ -176,6 +176,29 @@ export const getTransactionsByTransactionId = async (data) => {
 };
 
 
+export const getGiftsByGiftId = async (data) => {
+	console.log("pppppppppp", data);
+	try {
+		let params = {
+			TableName: process.env.GIFTS_TABLE_NAME,
+			KeyConditionExpression:
+				"#transactionId = :transactionId AND #userId = :userId",
+			ExpressionAttributeNames: {
+				"#transactionId": "transactionId",
+				"#userId": "userId",
+			},
+			ExpressionAttributeValues: {
+				":transactionId": data.transactionId,
+				":userId": data.userId,
+			},
+		};
+		return await dynamodb.query(params).promise();
+	} catch (error) {
+		throw error;
+	}
+};
+
+
 export const updateTransaction = async (data) => {
 	console.log("ddddddddddd", data);
 	let params = {};
@@ -194,7 +217,73 @@ export const updateTransaction = async (data) => {
 			"#deliveryObject": "deliveryObject"
 		},
 		ExpressionAttributeValues: {
-			":deliveryObject": data.deliveryObject,
+			":deliveryObject": data.deliveryTransactionObject,
+		},
+		UpdateExpression: "SET #deliveryObject = :deliveryObject",
+	};
+	// console.log("params", params);
+	try {
+		let updateData = await dynamodb.update(params).promise();
+		return updateData;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateDeliveryObjectAndWithGiftsArray = async (data) => {
+	console.log("ddddddddddd", data);
+	let params = {};
+	params = {
+		TableName: process.env.TRANSACTION_TABLE_NAME,
+		Key: {
+			userId: data.userId,
+			transactionId: data.transactionId,
+		},
+		ReturnValues: "ALL_NEW",
+	};
+
+	params = {
+		...params,
+		ExpressionAttributeNames: {
+			"#deliveryObject": "deliveryObject",
+			"#giftWith": "giftWith"
+
+		},
+		ExpressionAttributeValues: {
+			":deliveryObject": data.deliveryTransactionObject,
+			":giftWith": data.giftWith,
+
+		},
+		UpdateExpression: "SET #deliveryObject = :deliveryObject,#giftWith = :giftWith",
+	};
+	// console.log("params", params);
+	try {
+		let updateData = await dynamodb.update(params).promise();
+		return updateData;
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateGifts = async (data) => {
+	console.log("ddddddddddd", data);
+	let params = {};
+	params = {
+		TableName: process.env.GIFTS_TABLE_NAME,
+		Key: {
+			userId: data.userId,
+			transactionId: data.transactionId,
+		},
+		ReturnValues: "ALL_NEW",
+	};
+
+	params = {
+		...params,
+		ExpressionAttributeNames: {
+			"#deliveryObject": "deliveryObject"
+		},
+		ExpressionAttributeValues: {
+			":deliveryObject": data.deliveryGiftObject,
 		},
 		UpdateExpression: "SET #deliveryObject = :deliveryObject",
 	};
