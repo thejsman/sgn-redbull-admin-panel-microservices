@@ -12,13 +12,13 @@ const updateTransactionDelivery = async (event, context) => {
                 let data = await getTransactionsByTransactionId({ transactionId });
                 if (data && data.Items.length) {
                     let transaction = data.Items[0];
-                    let deliveryObject = {
+                    let deliveryTransactionObject = {
                         ...transaction.deliveryObject,
                         deliveryDate: deliveryDate,
                         deliveryStatus: "DELIVERED",
                         deliverySubTitle: "Item delivered"
                     };
-                    await updateTransaction({ deliveryObject, transactionId, userId: transaction.userId });
+                    await updateTransaction({ deliveryTransactionObject, transactionId, userId: transaction.userId });
                     let response = responseHandler({
                         statusCode: 200,
                         message: "Transactions Object",
