@@ -1,0 +1,4 @@
+MessageSendQueue:
+  Type: AWS::SQS::Queue
+  Properties:
+    QueueName: MessageSendQueue-${sls:stage}
