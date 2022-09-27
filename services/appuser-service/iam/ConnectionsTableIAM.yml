@@ -1,0 +1,10 @@
+ConnectionsTableIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:Scan
+
+  Resource:
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONNECTION_TABLE_NAME}"
+    - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CONNECTION_TABLE_NAME}/index/*"

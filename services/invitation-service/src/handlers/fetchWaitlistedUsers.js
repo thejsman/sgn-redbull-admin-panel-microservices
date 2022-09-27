@@ -12,7 +12,7 @@ const fetchWaitlistedUsers = async (event, context) => {
     const params = {
       TableName: process.env.WAITLISTEDUSERS_TABLE_NAME,
       ProjectionExpression:
-        "deviceType, countryCode, createdAt, countryName, pk, phone, dialCode",
+        "deviceType, countryCode, createdAt, countryName, pk, phone, dialCode,codeSentInfo",
     };
     if (mobile) {
       //if there is a mobile number in query then give first priority to mibile number
@@ -23,7 +23,7 @@ const fetchWaitlistedUsers = async (event, context) => {
       params.ExclusiveStartKey = key
         ? JSON.parse(Buffer.from(key, "base64").toString("ascii"))
         : undefined;
-      params.Limit = 1;
+      params.Limit = 50;
       params.ScanIndexForward = false;
       if (date) {
         params.IndexName = "waitlisteduser_created_date";
@@ -38,15 +38,15 @@ const fetchWaitlistedUsers = async (event, context) => {
         };
       }
     }
-    console.log("params--", params);
+
     let result = await dynamoDb.query(params).promise();
-    console.log("results", JSON.stringify(result), result.LastEvaluatedKey);
+    // console.log("results", JSON.stringify(result), result.LastEvaluatedKey);
 
     //check if there is next record into database
     params.ExclusiveStartKey = result.LastEvaluatedKey;
     params.Limit = 1;
     isNextRecordExists = await dynamoDb.query(params).promise();
-    console.log("isNextRecordExists---", isNextRecordExists);
+    // console.log("isNextRecordExists---", isNextRecordExists);
     isNextRecordExists = isNextRecordExists.Items.length > 0;
     //check if last evaluation key exists
     if (result.LastEvaluatedKey) {
@@ -56,7 +56,7 @@ const fetchWaitlistedUsers = async (event, context) => {
     } else {
       key = "";
     }
-    console.log("result.LastEvaluatedKey ---", key);
+    // console.log("result.LastEvaluatedKey ---", key);
     if (result.Items) {
       return responseHandler({
         statusCode: 200,

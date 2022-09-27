@@ -1,8 +1,8 @@
 {
-	"name": "admin-invitation-service",
+	"name": "admin-sticker-service",
 	"version": "1.0.0",
-	"description": "Sagoon Admin Invitation Service",
-	"author": "NB",
+	"description": "Sagoon Sticker Service",
+	"author": "AR",
 	"license": "MIT",
 	"devDependencies": {
 		"babel-core": "^6.26.3",
@@ -22,7 +22,6 @@
 		"aws-sdk": "^2.1090.0",
 		"axios": "^0.26.1",
 		"http-errors": "^2.0.0",
-		"json2csv": "^5.0.7",
 		"jsonwebtoken": "^8.5.1",
 		"serverless-domain-manager": "^6.0.2",
 		"twilio": "^3.75.1",

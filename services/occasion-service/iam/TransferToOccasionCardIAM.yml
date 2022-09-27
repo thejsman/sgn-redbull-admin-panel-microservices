@@ -1,0 +1,7 @@
+TransferToOccasionCardIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+  Resource:
+    - arn:aws:dynamodb:${self:provider.environment.REGION_IN_WHICH_TO_BE_COPIED}:*:table/${self:provider.environment.UPPER_STAGE_OCCASION_CARD_TABLE}
