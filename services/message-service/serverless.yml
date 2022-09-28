@@ -29,7 +29,6 @@ resources:
     MessageTable: ${file(resources/MessageTable.yml):MessageTable}
     MessageSendQueue: ${file(resources/MessageSendQueue.yml):MessageSendQueue}
 
-
 functions:
   sendMessage:
     handler: src/handlers/createMessage.handler
@@ -42,12 +41,11 @@ functions:
     handler: src/handlers/sendMessageQueue.handler
     events:
       - sqs:
-          arn: !GetAtt [MessageSendQueue, Arn]          
+          arn: !GetAtt [MessageSendQueue, Arn]
 
 custom:
   MessageTableName: MessageTable-${sls:stage}
   UserTableName: UserTable-${sls:stage}
-
 
   domains:
     dev: dev.sagoonlite.com

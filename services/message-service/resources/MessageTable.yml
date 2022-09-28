@@ -3,14 +3,14 @@ MessageTable:
   DeletionPolicy: Retain
   Properties:
     AttributeDefinitions:
-      - AttributeName: countryCode
+      - AttributeName: dialCode
         AttributeType: S
       - AttributeName: createdAt
-        AttributeType: S               
+        AttributeType: S
     KeySchema:
-      - AttributeName: countryCode
+      - AttributeName: dialCode
         KeyType: HASH
       - AttributeName: createdAt
-        KeyType: RANGE          
+        KeyType: RANGE
     BillingMode: PAY_PER_REQUEST
     TableName: ${self:custom.MessageTableName}
