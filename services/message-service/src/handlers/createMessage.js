@@ -8,15 +8,27 @@ import moment from "moment";
 const sendMessage = async (event, context) => {
   const now = new Date();
   try {
-    const { dialCode, createdDate, smsText } = event.body;
+    const {
+      dialCode = "977",
+      createdDate,
+      smsText,
+      mobileNumbers = null,
+    } = event.body;
+
     console.log(dialCode, createdDate, smsText);
     await saveMessage({
       smsText,
       dialCode,
+      mobileNumbers,
       createdAt: now.toISOString(),
       createdDate: moment().format("YYYY-MM-DD"),
     });
-    await putSendMessageOnSQS({ dialCode, createdDate, smsText });
+    await putSendMessageOnSQS({
+      dialCode,
+      createdDate,
+      smsText,
+      mobileNumbers,
+    });
     return responseHandler({
       statusCode: 200,
       message: "Message has been sent",
