@@ -3,6 +3,9 @@ import {
   //   sendIndiaSMS,
   getUsers,
 } from "../lib/messageHelper";
+// const sleep = () => {
+//   return new Promise((resolve) => setTimeout(resolve, 500));
+// };
 
 async function sendMessageQueue(event, context) {
   try {
@@ -27,11 +30,17 @@ async function sendMessageQueue(event, context) {
         //     await sendIndiaSMS(result[i].pk, smsText);
         //   }
       } else {
-        for (let i = 0; i < result.length; i++) {
-          // Do nothing
-          // await sendMessageViaAakash(result[i].phone, smsText);
-          console.log("Number: ", result[i].phone);
+        console.log("the length is :", result.length);
+
+        for (const record of result) {
+          // await sleep();
+          console.log("Check:", record.phone, ",");
         }
+        // for (let i = 0; i < result.length; i++) {
+        //   // Do nothing
+        //   // await sendMessageViaAakash(result[i].phone, smsText);
+        //   console.log("Number: ", result[i].phone);
+        // }
       }
     }
 

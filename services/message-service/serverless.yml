@@ -39,9 +39,11 @@ functions:
           cors: true
   sendMessageQueue:
     handler: src/handlers/sendMessageQueue.handler
+    timeout: 60
     events:
       - sqs:
           arn: !GetAtt [MessageSendQueue, Arn]
+    maximumRetryAttempts: 0
 
 custom:
   MessageTableName: MessageTable-${sls:stage}
