@@ -34,7 +34,7 @@ async function sendMessageQueue(event, context) {
 
         for (const record of result) {
           // await sleep();
-          console.log("Check:", record.phone, ",");
+          console.log("Check:", record.phone);
         }
         // for (let i = 0; i < result.length; i++) {
         //   // Do nothing

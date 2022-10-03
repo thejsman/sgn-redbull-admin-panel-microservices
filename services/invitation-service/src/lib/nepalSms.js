@@ -8,7 +8,7 @@ export const sendNepalSMS = async (
   switch (smsName) {
     case "INVITATION_SMS":
       // smsText = `Hi! ${payload.firstName} ${payload.dialCodePhone}, I am creating my Family Circle on Sagoon. I want to add you as ${payload.relation} and celebrate all our family events together. Join me using the invitation code ${payload.invitationCode}, it will expire in 24 hours. Download Sagoon App: ${payload.appLink}`;
-      smsText = `Welcome to New Sagoon! Login today using invitation code: ${payload.invitationCode} and earn upto Rs 50 reward balance. Hurry, code is valid for 24 hrs only. Download app ${payload.appLink}`;
+      smsText = `Sagoon Invites you to try the new family app and earn up to Rs. 50 cash reward\nUse invitation code: ${payload.invitationCode}\nDownload the app now ${payload.appLink}`;
       // smsText = `As requested, here’s your invitation code: ${payload.invitationCode} It expires in 24 hours. To sign up, download app ${payload.appLink} Enjoy connecting with your family and sharing gifts.`;
       break;
     case "DEAL_SUCCESS":
