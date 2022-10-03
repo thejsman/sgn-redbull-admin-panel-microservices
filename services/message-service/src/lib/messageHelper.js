@@ -20,6 +20,7 @@ export const saveMessage = async (message) => {
 
 export const getUsers = async (params = {}, data = []) => {
   let getFilterUsers = await getUsersByCountryCodeAndCreatedDate(params);
+
   if (data && data.length) {
     data = [...data, ...getFilterUsers.Items];
   } else {
@@ -32,7 +33,7 @@ export const getUsers = async (params = {}, data = []) => {
     let paginationParams = {
       ...params,
       userId: getFilterUsers.LastEvaluatedKey.userId,
-      countryCode: getFilterUsers.LastEvaluatedKey.countryCode,
+      dialCode: getFilterUsers.LastEvaluatedKey.dialCode,
       createdDate: getFilterUsers.LastEvaluatedKey.createdDate,
     };
     return getUsers(paginationParams, data);
@@ -44,6 +45,7 @@ export const getUsers = async (params = {}, data = []) => {
 const getUsersByCountryCodeAndCreatedDate = async (data) => {
   let params = {
     TableName: process.env.USER_TABLE_NAME,
+
     IndexName: "dialCode_createdDate-Index",
     KeyConditionExpression:
       "#dialCode = :dialCode and #createdDate >= :createdDate",
@@ -55,9 +57,9 @@ const getUsersByCountryCodeAndCreatedDate = async (data) => {
       ":dialCode": data.dialCode,
       ":createdDate": data.createdDate,
     },
+    ProjectionExpression: "phone",
   };
 
-  console.log({ params, data });
   if (data.userId) {
     params = {
       ...params,
