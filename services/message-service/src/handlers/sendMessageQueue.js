@@ -1,5 +1,5 @@
 import {
-  // sendMessageViaAakash,
+  sendMessageViaAakash,
   //   sendIndiaSMS,
   getUsers,
 } from "../lib/messageHelper";
@@ -24,23 +24,23 @@ async function sendMessageQueue(event, context) {
     } else {
       console.log({ smsText, dialCode, createdDate });
       let result = await getUsers({ dialCode, createdDate });
-      console.log({ result });
+
       if (dialCode === "91") {
         //   for (let i = 0; i < result.length; i++) {
         //     await sendIndiaSMS(result[i].pk, smsText);
         //   }
       } else {
         console.log("the length is :", result.length);
+        let smsPromises = [];
 
         for (const record of result) {
           // await sleep();
           console.log("Check:", record.phone);
+          smsPromises.push(sendMessageViaAakash(record.phone, smsText));
         }
-        // for (let i = 0; i < result.length; i++) {
-        //   // Do nothing
-        //   // await sendMessageViaAakash(result[i].phone, smsText);
-        //   console.log("Number: ", result[i].phone);
-        // }
+        const finalSmsPromise = await Promise.allSettled(smsPromises);
+        console.log({ finalSmsPromise });
+        console.log("All SMS Sent");
       }
     }
 
