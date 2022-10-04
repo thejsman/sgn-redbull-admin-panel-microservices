@@ -108,6 +108,35 @@ export const getSingleVoucher = async (data) => {
 	}
 };
 
+
+export const getSingleVoucherByPk = async (data) => {
+	console.log("data", data);
+	let params = {
+		TableName: process.env.VOUCHER_TABLE_NAME,
+		KeyConditionExpression: "#pk=:pk",
+		ExpressionAttributeNames: {
+			"#pk": "pk",
+		},
+		ExpressionAttributeValues: {
+			":pk": data.pk,
+		},
+	};
+	// if (data.couponVoucherId !== "null") {
+	// 	params = {
+	// 		...params,
+	// 		ExclusiveStartKey: {
+	// 			pk: data.pk,
+	// 			couponVoucherId: data.couponVoucherId,
+	// 		},
+	// 	};
+	// }
+	try {
+		return await dynamodb.query(params).promise();
+	} catch (error) {
+		throw error;
+	}
+};
+
 export const getVoucherByVoucherId = async (data) => {
 	console.log("data", data);
 	let params = {
@@ -147,7 +176,7 @@ export const bulkUpdateVouchers = async (data) => {
 			"#voucherStatus": "voucherStatus",
 		},
 		ExpressionAttributeValues: {
-			":country": "India",
+			":country": data.country,
 			":voucherStatus": "notArchived",
 		},
 		UpdateExpression: "SET #country = :country, #voucherStatus = :voucherStatus",
