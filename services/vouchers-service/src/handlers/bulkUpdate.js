@@ -1,16 +1,15 @@
 /*eslint new-cap: ["error", { "newIsCap": false }]*/
 const { responseHandler } = require("../lib/response");
 import commonMiddleware from "../../../../packages/common-middleware";
-import { voucherScan, bulkUpdateVouchers } from "../lib/voucherHelper";
+import { getSingleVoucherByPk, bulkUpdateVouchers } from "../lib/voucherHelper";
 // const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const bulkUpdate = async (event, context) => {
     // const timestamp = new Date().getTime();
     const data = event.body;
     try {
-        let allData = await voucherScan(data);
-        console.log("allData",allData.Items.length,allData.Items);
+        let allData = await getSingleVoucherByPk({ ...data, limit: 10000});
         for (let i = 0; i < allData.Items.length; i++) {
-            await bulkUpdateVouchers(allData.Items[i]);
+            await bulkUpdateVouchers({ ...allData.Items[i], ...data });
         }
         return responseHandler({
             statusCode: 200,

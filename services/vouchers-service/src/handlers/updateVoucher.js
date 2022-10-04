@@ -12,7 +12,7 @@ const updateVoucher = async (event, context) => {
 			updateData = await updateVoucherStatus(data);
 		}
 		else if (data.voucherStatus) {
-			let allVouchers = await getSingleVoucher({ ...data, limit: 10000 });
+			let allVouchers = await getSingleVoucher({ ...data, limit: 10000,pk:"null" });
 			for (let i = 0; i < allVouchers.Items.length; i++) {
 				updateData = await updateVoucherVoucherStatus({ ...allVouchers.Items[i], voucherStatus: data.voucherStatus });
 			}
