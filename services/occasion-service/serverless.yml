@@ -74,13 +74,6 @@ functions:
           method: GET
           path: /occasion
           cors: true
-  getPredefinedOccasions:
-    handler: src/handlers/GetPredefinedOccasions.handler
-    events:
-      - http:
-          method: GET
-          path: /predefinedOccasion
-          cors: true
   cloneOccasions:
     handler: src/handlers/SyncOccasionToUpperRegion.handler
     events:
@@ -102,26 +95,12 @@ functions:
           method: GET
           path: /occasion/{occasionName}
           cors: true
-  GetPredefinedOccasionByName:
-    handler: src/handlers/GetPredefinedOccasionByName.handler
-    events:
-      - http:
-          method: GET
-          path: /predefinedOccasion/{occasionName}
-          cors: true
   DeleteOccasion:
     handler: src/handlers/DeleteOccasion.handler
     events:
       - http:
           method: DELETE
           path: /occasion/{occasionName}
-          cors: true
-  DeletePredefinedOccasion:
-    handler: src/handlers/DeletePredefinedOccasion.handler
-    events:
-      - http:
-          method: DELETE
-          path: /predefinedOccasion/{occasionName}
           cors: true
   getTemplates:
     handler: src/handlers/GetTemplates.handler
