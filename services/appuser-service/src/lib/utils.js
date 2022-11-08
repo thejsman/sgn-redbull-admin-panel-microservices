@@ -114,7 +114,7 @@ export const getRewardsByUserId = async (userId) => {
   try {
     let params = {
       TableName: process.env.USER_REWARDS_TABLE_NAME,
-      ScanIndexForward: true,
+      ScanIndexForward: false,
       KeyConditionExpression: "#userId = :userId",
       ExpressionAttributeNames: {
         "#userId": "userId",
