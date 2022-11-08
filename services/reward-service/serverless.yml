@@ -1,0 +1,59 @@
+service: admin-reward-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage, 'staging'}
+  region: ${self:custom.region.${sls:stage}}
+  layers:
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:common-middleware-layer:${self:custom.commonMiddlewareLayerVersion.${sls:stage}}
+
+  environment:
+    STAGE: ${sls:stage}
+    REGION: ${self:provider.region}
+    USER_REWARDS_TABLE_NAME: UserRewardsTable-${sls:stage}
+    USER_TABLE_NAME: UserTable-${sls:stage}
+
+  iam:
+    role:
+      statements:
+        - ${file(iam/UserRewardsTableIAM.yml):UserRewardsTableIAM}
+
+functions:
+  addReward:
+    handler: src/handlers/addReward.handler
+    events:
+      - http:
+          method: POST
+          path: /reward
+          cors: true
+custom:
+  domains:
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    basePath: "adminRewards"
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: "edge"
+
+  commonMiddlewareLayerVersion:
+    dev: 9
+    staging: 1
+    prod: 1
+  bundle:
+    forceExclude: ["common-middleware-layer"]
