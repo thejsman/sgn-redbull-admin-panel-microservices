@@ -25,20 +25,25 @@ async function CreateOccasionCard(event, context) {
     //check if there id lottie json the stoe this json on s3
     if (
       data.lottie.lottieBackground &&
-      data.lottie.lottieBackground.includes("application/json")
+      (data.lottie.lottieBackground.includes("image/") || data.lottie.lottieBackground.includes("application/json"))
     ) {
       //now store it on s3
       type = data.lottie.lottieBackground.split(";")[0].split("/")[1];
+      data.lottie.lottieBackground = data.lottie.lottieBackground.replace(
+        /^data:image\/\w+;base64,/,
+        ""
+      ).replace(
+        /^data:application\/\w+;base64,/,
+        ""
+      );
       base64Data = Buffer.from(
-        data.lottie.lottieBackground.replace(
-          /^data:application\/\w+;base64,/,
-          ""
-        ),
+        data.lottie.lottieBackground,
         "base64"
       );
+      let lottieBackgroundFileName = data.lottie.lottieBackgroundFileName.split(".");
       s3Params = {
         Bucket: process.env.OCCASION_ICON_FOLDER,
-        Key: `${uuid()}.json`,
+        Key: `${uuid()}.${lottieBackgroundFileName[1]}`,
         Body: base64Data,
         ContentEncoding: "base64",
         ContentType: type,
@@ -56,17 +61,27 @@ async function CreateOccasionCard(event, context) {
     }
     if (
       data.lottie.lottieGraphic &&
-      data.lottie.lottieGraphic.includes("application/json")
+      (data.lottie.lottieGraphic.includes("image/") || data.lottie.lottieGraphic.includes("application/json"))
     ) {
       //now store it on s3
       type = data.lottie.lottieGraphic.split(";")[0].split("/")[1];
+
+      data.lottie.lottieGraphic = data.lottie.lottieGraphic.replace(
+        /^data:image\/\w+;base64,/,
+        ""
+      ).replace(
+        /^data:application\/\w+;base64,/,
+        ""
+      );
       base64Data = Buffer.from(
-        data.lottie.lottieGraphic.replace(/^data:application\/\w+;base64,/, ""),
+        data.lottie.lottieGraphic,
         "base64"
       );
+      let lottieGraphicFileName = data.lottie.lottieGraphicFileName.split(".");
+
       s3Params = {
         Bucket: process.env.OCCASION_ICON_FOLDER,
-        Key: `${uuid()}.json`,
+        Key: `${uuid()}.${lottieGraphicFileName[1]}`,
         Body: base64Data,
         ContentEncoding: "base64",
         ContentType: type,
