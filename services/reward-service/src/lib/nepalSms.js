@@ -21,7 +21,7 @@ export const sendNepalSMS = async (
       smsText = `New Gift: ${payload.senderName} sent you gift on ${payload.occasionTitle} Check your gift details in ${payload.link}. ${payload.senderName}'s message will expire in 24 hours. Hurry up and check before it gets deleted. Enjoy Gifting! Team Sagoon`;
       break;
     case "REWARD_ADDED":
-      smsText = `Reward:${payload.reward} aded. Enjoy Gifting! Team Sagoon`;
+      smsText = `Rs. ${payload.reward} signup reward has been added to your Sagoon account. You can use the reward to buy deals on the Sagoon app.`;
       break;
     default:
       smsText = "";
