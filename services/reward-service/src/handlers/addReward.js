@@ -24,7 +24,9 @@ async function addRewards(event, context) {
     console.log("Update result:", result);
     //send sms now
     if (dialCode && phone) {
-      await sendSMS(dialCode, phone, amount);
+      console.log('sending sms');
+      let smsresult = await sendSMS({ dialCode, phone, amount });
+      console.log('smsresult', smsresult);
     }
 
 

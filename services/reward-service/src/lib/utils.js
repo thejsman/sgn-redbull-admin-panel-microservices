@@ -72,15 +72,17 @@ export const sendSMS = async ({ dialCode, phone, reward }) => {
   try {
     const flowId = "62cec8b74b9314686017b592";
     let result;
+    console.log('dialCode', dialCode);
     if (dialCode == "91") {
       result = await sendIndiaSMS(flowId, `${dialCode}${phone}`, {
         reward
       });
     } else if (dialCode == "977") {
-      result = await sendNepalSMS("INVITATION_SMS", `${dialCode}${phone}`, {
+      result = await sendNepalSMS("REWARD_ADDED", `${dialCode}${phone}`, {
         reward
       });
     }
+    console.log('result', result);
     return result;
   } catch (e) {
     return { message: "could not be send", type: "failed" };
