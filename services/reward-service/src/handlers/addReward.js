@@ -1,9 +1,8 @@
 import { commonMiddleware } from "common-middleware-layer";
-import { updateUserReward, createRewardTransaction } from "../lib/utils";
-
+import { updateUserReward, createRewardTransaction, sendSMS } from "../lib/utils";
 async function addRewards(event, context) {
   try {
-    const { userId, amount, description, transactionType } = event.body;
+    const { userId, amount, description, transactionType, dialCode, phone } = event.body;
 
     if (!userId) {
       return {
@@ -23,6 +22,11 @@ async function addRewards(event, context) {
       updateUserReward(userId, payload),
     ]);
     console.log("Update result:", result);
+    //send sms now
+    if (dialCode && phone) {
+      await sendSMS(dialCode, phone, amount);
+    }
+
 
     return {
       statusCode: 200,
