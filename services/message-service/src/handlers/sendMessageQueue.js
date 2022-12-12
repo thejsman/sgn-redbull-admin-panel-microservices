@@ -1,3 +1,4 @@
+import AWS from "aws-sdk";
 import {
   sendMessageViaAakash,
   //   sendIndiaSMS,
@@ -7,14 +8,15 @@ import {
 //   return new Promise((resolve) => setTimeout(resolve, 500));
 // };
 
+const sqs = new AWS.SQS();
 async function sendMessageQueue(event, context) {
   try {
-    const record = event.Records[0];
+    const { receiptHandle, body } = event.Records[0];
     const { smsText, dialCode, createdDate, mobileNumbers } = await JSON.parse(
-      record.body
+      body
     );
 
-    console.log({ smsText, dialCode, createdDate, mobileNumbers });
+    console.log({ receiptHandle, smsText, dialCode, createdDate, mobileNumbers });
     if (mobileNumbers) {
       //split the mobileNumbers and send SMS
       const mobileNumbersArray = mobileNumbers.split(",");
@@ -32,21 +34,38 @@ async function sendMessageQueue(event, context) {
       } else {
         console.log("the length is :", result.length);
         let smsPromises = [];
-
-        for (const record of result) {
-          // await sleep();
-          console.log("Check:", record.phone);
-          smsPromises.push(sendMessageViaAakash(record.phone, smsText));
+        //deviding into checks
+        while (result.length > 0) {
+          smsPromises.push(result.splice(-1000).map(item => item.phone.trim()).join());
         }
-        const finalSmsPromise = await Promise.allSettled(smsPromises);
-        console.log({ finalSmsPromise });
-        console.log("All SMS Sent");
+        console.log('phone numner chunks', smsPromises.length, JSON.stringify(smsPromises));
+        try {
+          //smsPromises.push(sendMessageViaAakash(record.phone, smsText));
+          const finalSmsPromise = await Promise.allSettled(smsPromises.map(async (mobiles) => {
+            return await sendMessageViaAakash(mobiles, smsText);
+          }));
+          console.log({ finalSmsPromise });
+          console.log("All SMS Sent");
+
+        } catch (e) {
+          console.log('error in processing sms', e);
+        } finally {
+          console.log('in finally', receiptHandle, process.env.MESSAGE_SEND_QUEUE);
+          //now delete that sqs message id saying it has been completed
+          let deletedSQSHndlerResult = await sqs
+            .deleteMessage({
+              QueueUrl: process.env.MESSAGE_SEND_QUEUE,
+              ReceiptHandle: receiptHandle,
+            })
+            .promise();
+          console.log('in finally 1', deletedSQSHndlerResult);
+        }
       }
     }
 
     // console.log("numbers", result);
   } catch (error) {
-    console.log("Exception in cleanPreUser", { error });
+    console.log("Exception in sendMessageQueue", { error });
   }
 }
 
