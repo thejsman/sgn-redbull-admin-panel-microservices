@@ -38,7 +38,7 @@ async function sendMessageQueue(event, context) {
         while (result.length > 0) {
           smsPromises.push(result.splice(-1000).map(item => item.phone.trim()).join());
         }
-        console.log('phone numner chunks', smsPromises.length, json.stringify(smsPromises));
+        console.log('phone numner chunks', smsPromises.length, JSON.stringify(smsPromises));
         try {
           //smsPromises.push(sendMessageViaAakash(record.phone, smsText));
           const finalSmsPromise = await Promise.allSettled(smsPromises.map(async (mobiles) => {
