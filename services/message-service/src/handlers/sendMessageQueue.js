@@ -46,7 +46,7 @@ async function sendMessageQueue(event, context) {
 
     // console.log("numbers", result);
   } catch (error) {
-    console.log("Exception in cleanPreUser", { error });
+    console.log("Exception in sendMessageQueue", { error });
   }
 }
 

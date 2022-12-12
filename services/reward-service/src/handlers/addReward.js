@@ -5,14 +5,21 @@ async function addRewards(event, context) {
   try {
     const { userId, amount, description, transactionType } = event.body;
 
-    if (!userId) {
+    // console.log({ eventBody: event.body });
+    if (!userId || !amount || !description || !transactionType) {
       return {
-        statusCode: 401,
+        statusCode: 400,
+        headers: {
+          "access-control-allow-origin": "*",
+          "Access-Control-Allow-Headers": "*",
+          "Access-Control-Allow-Methods": "*",
+        },
         body: JSON.stringify({
-          errorMessage: "not authorized",
+          errorMessage: "Missing params",
         }),
       };
     }
+
     const payload = {};
     payload.userId = userId;
     payload.transactionType = transactionType;
@@ -23,9 +30,14 @@ async function addRewards(event, context) {
       updateUserReward(userId, payload),
     ]);
     console.log("Update result:", result);
-
+    // "access-control-allow-origin": `${process.env.STAGE}.sagoon.com`,
     return {
       statusCode: 200,
+      headers: {
+        "access-control-allow-origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "*",
+      },
       body: JSON.stringify({
         message: "success",
         amount,
@@ -35,6 +47,17 @@ async function addRewards(event, context) {
     };
   } catch (error) {
     console.log("Exception in addRewards", error);
+    return {
+      statusCode: 500,
+      headers: {
+        "access-control-allow-origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "*",
+      },
+      body: JSON.stringify({
+        message: "Something went wrong, please try after sometime",
+      }),
+    };
   }
 }
 export const handler = commonMiddleware(addRewards);
