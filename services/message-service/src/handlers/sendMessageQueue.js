@@ -17,6 +17,13 @@ async function sendMessageQueue(event, context) {
     );
 
     console.log({ receiptHandle, smsText, dialCode, createdDate, mobileNumbers });
+    let deletedSQSHndlerResult = await sqs
+      .deleteMessage({
+        QueueUrl: process.env.MESSAGE_SEND_QUEUE,
+        ReceiptHandle: receiptHandle,
+      })
+      .promise();
+    console.log('in finally 1', deletedSQSHndlerResult);
     if (mobileNumbers) {
       //split the mobileNumbers and send SMS
       const mobileNumbersArray = mobileNumbers.split(",");
@@ -52,13 +59,7 @@ async function sendMessageQueue(event, context) {
         } finally {
           console.log('in finally', receiptHandle, process.env.MESSAGE_SEND_QUEUE);
           //now delete that sqs message id saying it has been completed
-          let deletedSQSHndlerResult = await sqs
-            .deleteMessage({
-              QueueUrl: process.env.MESSAGE_SEND_QUEUE,
-              ReceiptHandle: receiptHandle,
-            })
-            .promise();
-          console.log('in finally 1', deletedSQSHndlerResult);
+
         }
       }
     }
