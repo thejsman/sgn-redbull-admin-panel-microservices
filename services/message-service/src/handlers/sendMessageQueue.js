@@ -17,6 +17,7 @@ async function sendMessageQueue(event, context) {
     );
 
     console.log({ receiptHandle, smsText, dialCode, createdDate, mobileNumbers });
+
     let deletedSQSHndlerResult = await sqs
       .deleteMessage({
         QueueUrl: process.env.MESSAGE_SEND_QUEUE,
@@ -45,7 +46,7 @@ async function sendMessageQueue(event, context) {
         while (result.length > 0) {
           smsPromises.push(result.splice(-1000).map(item => item.phone.trim()).join());
         }
-        console.log('phone numner chunks', smsPromises.length, JSON.stringify(smsPromises));
+        console.log('phone number chunks', smsPromises.length, JSON.stringify(smsPromises));
         try {
           //smsPromises.push(sendMessageViaAakash(record.phone, smsText));
           const finalSmsPromise = await Promise.allSettled(smsPromises.map(async (mobiles) => {
