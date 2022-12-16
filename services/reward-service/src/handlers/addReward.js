@@ -29,7 +29,14 @@ async function addRewards(event, context) {
       updateUserReward(userId, payload),
     ]);
     console.log("Update result:", result);
-    // "access-control-allow-origin": `${process.env.STAGE}.sagoon.com`,
+    //send sms now
+    if (dialCode && phone) {
+      console.log('sending sms');
+      let smsresult = await sendSMS({ dialCode, phone, reward: amount });
+      console.log('smsresult', smsresult);
+    }
+
+
     return {
       statusCode: 200,
       headers: {
