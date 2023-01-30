@@ -1,0 +1,54 @@
+service: admin-dau-mau-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.region.${sls:stage}}
+
+  environment:
+    REGION: ${self:provider.region}
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
+    STAGE: ${sls:stage}
+  iam:
+    role:
+      statements:
+        - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+
+functions:
+  userLoggedIn:
+    handler: src/handlers/userLoggedIn.handler
+    timeout: 30
+    events:
+      - http:
+          method: POST
+          path: /userLoggedIn
+          cors: true
+
+custom:
+  domains:
+    dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: userAnalytics
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge
