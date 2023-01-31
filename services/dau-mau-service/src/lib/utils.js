@@ -23,11 +23,11 @@ export const updateUserLoggedInActivityStats = async (payload) => {
         prevMonthData = prevMonthData && prevMonthData.Items.length ? prevMonthData.Items[0]["countInfo"]
             : {};
         //check if current date is available in data then update count by 1 if current date is not there then add data for curdate
-        currMonthData = currDateCount > 0 ? { ...currMonthData, [currDate]: { "date": currDate, "count": currDateCount } } : { ...currMonthData };
-        currMonthData = (currMonth == prevMonth) && prevDateCount > 0 ? { ...currMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...currMonthData };
-        currMonthData = currMonthCount > 0 ? { ...currMonthData, "count": currMonthCount } : { ...currMonthData };
-        prevMonthData = (currMonth != prevMonth) && prevDateCount > 0 ? { ...prevMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...prevMonthData };
-        prevMonthData = (currMonth != prevMonth) && prevMonthCount > 0 ? { ...prevMonthData, "count": prevMonthCount } : { ...prevMonthData };
+        currMonthData = currDateCount > 0 && currMonthData[currDate] && (currMonthData[currDate]["count"] < currDateCount) ? { ...currMonthData, [currDate]: { "date": currDate, "count": currDateCount } } : { ...currMonthData };
+        currMonthData = (currMonth == prevMonth) && currMonthData[prevDate] && (prevDateCount > currMonthData[prevDate]["count"]) ? { ...currMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...currMonthData };
+        currMonthData = currMonthCount > currMonthData["count"] ? { ...currMonthData, "count": currMonthCount } : { ...currMonthData };
+        prevMonthData = (currMonth != prevMonth) && (prevDateCount > prevMonthData[prevDate]["count"]) ? { ...prevMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...prevMonthData };
+        prevMonthData = (currMonth != prevMonth) && prevMonthCount > prevMonthData["count"] ? { ...prevMonthData, "count": prevMonthCount } : { ...prevMonthData };
         //Now update the data into DynamoDB
         console.log('currMonthData', currMonthData);
         console.log('prevMonthData', prevMonthData);
