@@ -31,6 +31,10 @@ functions:
           method: POST
           path: /userLoggedIn
           cors: true
+  syncingDauMauInDb:
+    handler: src/handlers/syncingDauMauInDb.handler
+    events:
+      - schedule: rate(${self:custom.cronTime.${sls:stage}})
 
 custom:
   domains:
@@ -44,6 +48,11 @@ custom:
     testing: ap-southeast-1
     staging: ap-southeast-1
     prod: ap-south-1
+
+  cronTime:
+    dev: 1 minute
+    staging: 1 minute
+    prod: 1 minute
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
