@@ -1,0 +1,17 @@
+UsersLoggedInActivityStatsTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: pk
+        AttributeType: S
+      - AttributeName: type
+        AttributeType: S
+
+    KeySchema:
+      - AttributeName: pk
+        KeyType: HASH
+      - AttributeName: type
+        KeyType: RANGE
+
+    BillingMode: PAY_PER_REQUEST
+    TableName: ${self:provider.environment.USERS_LOGGED_IN_ACTIVITY_STATS_TABLE}

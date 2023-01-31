@@ -17,10 +17,16 @@ provider:
     REGION: ${self:provider.region}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
     STAGE: ${sls:stage}
+    USERS_LOGGED_IN_ACTIVITY_STATS_TABLE: UsersLoggedInActivityStatsTable-${sls:stage}
   iam:
     role:
       statements:
+        - ${file(iam/UsersLoggedInActivityStatsTableIAM.yml):UsersLoggedInActivityStatsTableIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+
+resources:
+  Resources:
+    UsersLoggedInActivityStatsTable: ${file(resources/UsersLoggedInActivityStatsTable.yml):UsersLoggedInActivityStatsTable}
 
 functions:
   userLoggedIn:
@@ -50,9 +56,9 @@ custom:
     prod: ap-south-1
 
   cronTime:
-    dev: 1 minute
+    dev: 1 hour
     staging: 1 minute
-    prod: 1 minute
+    prod: 1 hour
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
