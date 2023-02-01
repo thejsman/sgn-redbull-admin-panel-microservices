@@ -38,7 +38,7 @@ functions:
     events:
       - http:
           method: POST
-          path: /userLoggedIn
+          path: /appLaunch
           cors: true
           authorizer: ${self:custom.authorizer}
   syncingDauMauInDb:
