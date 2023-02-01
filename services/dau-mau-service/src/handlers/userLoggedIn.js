@@ -1,19 +1,29 @@
-/*eslint new-cap: ["error", { "newIsCap": false }]*/
-import commonMiddleware from "../../../../packages/common-middleware";
+import { commonMiddleware } from "common-middleware-layer";
 import { responseHandler } from "../lib/response";
 import { setRedisSets } from "redis-middleware";
+import { getUserFromToken } from "jwt-layer";
 
 const userLoggedIn = async (event, context) => {
   try {
-    let { userId } = event.body;
+    const { user } = await getUserFromToken(event.headers.Authorization);
+    const redisPrefixForDau = 'DAU';
+    const redisPrefixForMau = 'MAU';
+    if (!user) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({
+          errorMessage: "not authorized",
+        }),
+      };
+    }
     const now = new Date();
     let currDate = now.toISOString().slice(0, 10);
     let currMonth = now.toISOString().slice(0, 7);
 
-    console.log('userId', userId);
+    console.log('userId', user.userId);
     //logged this user id for today date in redis
-    await setRedisSets(currDate, userId);
-    await setRedisSets(currMonth, userId);
+    await setRedisSets(`${redisPrefixForDau}-${currDate}`, user.userId);
+    await setRedisSets(`${redisPrefixForMau}-${currMonth}`, user.userId);
     let response = responseHandler({
       statusCode: 200,
       message: "Activity Registered"

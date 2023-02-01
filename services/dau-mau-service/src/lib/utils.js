@@ -9,10 +9,9 @@ export const updateUserLoggedInActivityStats = async (payload) => {
     if (currMonth !== prevMonth) {
         prevMonthCountQuery = prepareUserLoggedInActivityStatsFetchQuery(prevMonth, "allCounts");
     }
-
-
     try {
         let currMonthData = dynamoDb.query(currMonthCountQuery).promise();
+
         let prevMonthData = ((currMonth !== prevMonth) && prevMonthCount) ? dynamoDb.query(prevMonthCountQuery).promise() : '';
         [currMonthData, prevMonthData] =
             await Promise.all([currMonthData, prevMonthData]);
@@ -26,11 +25,9 @@ export const updateUserLoggedInActivityStats = async (payload) => {
         currMonthData = (currDateCount > 0 && !currMonthData[currDate]) || (currDateCount > 0 && currMonthData[currDate] && (currMonthData[currDate]["count"] < currDateCount)) ? { ...currMonthData, [currDate]: { "date": currDate, "count": currDateCount } } : { ...currMonthData };
         currMonthData = (currMonth == prevMonth) && (!currMonthData[prevDate] && prevDateCount > 0 || currMonthData[prevDate] && (prevDateCount > currMonthData[prevDate]["count"])) ? { ...currMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...currMonthData };
         currMonthData = !currMonthData["count"] && currMonthCount > 0 || currMonthCount > currMonthData["count"] ? { ...currMonthData, "count": currMonthCount } : { ...currMonthData };
-        prevMonthData = (currMonth != prevMonth) && (!prevMonthData[prevDate] && prevDateCount > 0 || prevDateCount > prevMonthData[prevDate]["count"]) ? { ...prevMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...prevMonthData };
-        prevMonthData = (currMonth != prevMonth) && (!prevMonthData["count"] && prevMonthCount > 0 || prevMonthCount > prevMonthData["count"]) ? { ...prevMonthData, "count": prevMonthCount } : { ...prevMonthData };
+        prevMonthData = (currMonth != prevMonth) && (!prevMonthData[prevDate] && prevDateCount > 0 || prevMonthData[prevDate] && prevDateCount > prevMonthData[prevDate]["count"]) ? { ...prevMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...prevMonthData };
+        prevMonthData = (currMonth != prevMonth) && (!prevMonthData["count"] && prevMonthCount > 0 || prevMonthData["count"] && prevMonthCount > prevMonthData["count"]) ? { ...prevMonthData, "count": prevMonthCount } : { ...prevMonthData };
         //Now update the data into DynamoDB
-        console.log('currMonthData', currMonthData);
-        console.log('prevMonthData', prevMonthData);
         //Now update the occasion data for perticular month & date
         currMonthCountQuery = currDateCount > 0 || currMonthCount > 0 ? prepareUserActivityLoggedInStatsUpdateQuery(
             currMonth,

@@ -12,12 +12,15 @@ provider:
   memorySize: 256
   stage: ${opt:stage, 'dev'}
   region: ${self:custom.region.${sls:stage}}
-
+  layers:
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:jwt-layer:${self:custom.jwtLayerVersion.${sls:stage}}
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:common-middleware-layer:${self:custom.commonMiddlewareLayerVersion.${sls:stage}}
   environment:
     REGION: ${self:provider.region}
     ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
     STAGE: ${sls:stage}
     USERS_LOGGED_IN_ACTIVITY_STATS_TABLE: UsersLoggedInActivityStatsTable-${sls:stage}
+    ACCESS_TOKEN_SECRET: ${self:custom.accessTokenSecret.${sls:stage}}
   iam:
     role:
       statements:
@@ -37,6 +40,7 @@ functions:
           method: POST
           path: /userLoggedIn
           cors: true
+          authorizer: ${self:custom.authorizer}
   syncingDauMauInDb:
     handler: src/handlers/syncingDauMauInDb.handler
     events:
@@ -60,6 +64,24 @@ custom:
     staging: 1 minute
     prod: 1 hour
 
+  authorizer:
+    name: VerifyTokenARN
+    arn:
+      Fn::ImportValue: VerifyTokenARN
+  jwtLayerVersion:
+    dev: 8
+    staging: 1
+    prod: 1
+  commonMiddlewareLayerVersion:
+    dev: 9
+    staging: 1
+    prod: 1
+
+  accessTokenSecret:
+    dev: ${env:ACCESS_TOKEN_SECRET}
+    staging: ${env:ACCESS_TOKEN_SECRET}
+    prod: ${env:ACCESS_TOKEN_SECRET_PROD}
+
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
     certificateName: ${self:custom.domains.${sls:stage}}
@@ -67,3 +89,6 @@ custom:
     stage: ${sls:stage}
     createRoute53Record: true
     endpointType: edge
+
+  bundle:
+    forceExclude: ["jwt-layer", "common-middleware-layer"]
