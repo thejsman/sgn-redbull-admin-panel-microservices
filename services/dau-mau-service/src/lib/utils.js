@@ -2,31 +2,49 @@ import AWS from "aws-sdk";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 export const updateUserLoggedInActivityStats = async (payload) => {
     //waitlistedUser registration date, fetching it from payload
-    let { currDate, currMonth, prevDate, prevMonth, currDateCount, currMonthCount, prevDateCount, prevMonthCount } = payload;
+    let { currDate, currMonth, prevDate, prevMonth, currDateCount, currMonthCount, prevDateCount, prevMonthCount, thisWeekNumber, yesterdayWeekNumber, thisWeekCount, prevWeekCount } = payload;
     let prevMonthCountQuery = '';
     let currMonthCountQuery = '';
+    let prevWeekCountQuery = '';
+    let currWeekCountQuery = '';
     currMonthCountQuery = prepareUserLoggedInActivityStatsFetchQuery(currMonth, "allCounts");
+    currWeekCountQuery = prepareUserLoggedInActivityStatsFetchQuery(thisWeekNumber, "allCounts");
+
     if (currMonth !== prevMonth) {
         prevMonthCountQuery = prepareUserLoggedInActivityStatsFetchQuery(prevMonth, "allCounts");
     }
+    if (thisWeekNumber !== yesterdayWeekNumber) {
+        prevWeekCountQuery = prepareUserLoggedInActivityStatsFetchQuery(yesterdayWeekNumber, "allCounts");
+    }
     try {
         let currMonthData = dynamoDb.query(currMonthCountQuery).promise();
-
+        let currWeekData = dynamoDb.query(currWeekCountQuery).promise();
         let prevMonthData = ((currMonth !== prevMonth) && prevMonthCount) ? dynamoDb.query(prevMonthCountQuery).promise() : '';
+        let prevWeekData = ((thisWeekNumber !== yesterdayWeekNumber) && prevWeekCount) ? dynamoDb.query(prevWeekCountQuery).promise() : '';
         [currMonthData, prevMonthData] =
             await Promise.all([currMonthData, prevMonthData]);
+        [currWeekData, prevWeekData] =
+            await Promise.all([currWeekData, prevWeekData]);
         //extract the data object for current months
         currMonthData = currMonthData.Items.length
             ? currMonthData.Items[0]["countInfo"]
             : {};
         prevMonthData = prevMonthData && prevMonthData.Items.length ? prevMonthData.Items[0]["countInfo"]
             : {};
+        currWeekData = currWeekData.Items.length
+            ? currWeekData.Items[0]["countInfo"]
+            : 0;
+        prevWeekData = prevWeekData && prevWeekData.Items.length ? prevWeekData.Items[0]["countInfo"]
+            : 0;
         //check if current date is available in data then update count by 1 if current date is not there then add data for curdate
         currMonthData = (currDateCount > 0 && !currMonthData[currDate]) || (currDateCount > 0 && currMonthData[currDate] && (currMonthData[currDate]["count"] < currDateCount)) ? { ...currMonthData, [currDate]: { "date": currDate, "count": currDateCount } } : { ...currMonthData };
         currMonthData = (currMonth == prevMonth) && (!currMonthData[prevDate] && prevDateCount > 0 || currMonthData[prevDate] && (prevDateCount > currMonthData[prevDate]["count"])) ? { ...currMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...currMonthData };
         currMonthData = !currMonthData["count"] && currMonthCount > 0 || currMonthCount > currMonthData["count"] ? { ...currMonthData, "count": currMonthCount } : { ...currMonthData };
         prevMonthData = (currMonth != prevMonth) && (!prevMonthData[prevDate] && prevDateCount > 0 || prevMonthData[prevDate] && prevDateCount > prevMonthData[prevDate]["count"]) ? { ...prevMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...prevMonthData };
         prevMonthData = (currMonth != prevMonth) && (!prevMonthData["count"] && prevMonthCount > 0 || prevMonthData["count"] && prevMonthCount > prevMonthData["count"]) ? { ...prevMonthData, "count": prevMonthCount } : { ...prevMonthData };
+        currWeekData = !currWeekData && thisWeekCount > 0 || thisWeekCount > currWeekData ? thisWeekCount : currWeekData;
+        prevWeekData = (thisWeekNumber != yesterdayWeekNumber) && (!prevWeekData && prevWeekCount > 0 || prevWeekData && prevWeekCount > prevWeekData) ? prevWeekCount : prevWeekData;
+
         //Now update the data into DynamoDB
         //Now update the occasion data for perticular month & date
         currMonthCountQuery = currDateCount > 0 || currMonthCount > 0 ? prepareUserActivityLoggedInStatsUpdateQuery(
@@ -40,11 +58,27 @@ export const updateUserLoggedInActivityStats = async (payload) => {
             prevMonthData
         ) : '';
 
+        currWeekCountQuery = thisWeekCount > 0 || thisWeekCount > 0 ? prepareUserActivityLoggedInStatsUpdateQuery(
+            thisWeekNumber,
+            "allCounts",
+            currWeekData
+        ) : '';
+        prevWeekCountQuery = prevWeekCount > 0 || ((thisWeekNumber != yesterdayWeekNumber) && prevWeekCount > 0) ? prepareUserActivityLoggedInStatsUpdateQuery(
+            yesterdayWeekNumber,
+            "allCounts",
+            prevWeekData
+        ) : '';
+
         let currMonthCountQueryStatus = currMonthCountQuery ? dynamoDb.update(currMonthCountQuery).promise() : '';
         let prevMonthCountQueryStatus = prevMonthCountQuery ? dynamoDb.update(prevMonthCountQuery).promise() : '';
+        let currWeekCountQueryStatus = currWeekCountQuery ? dynamoDb.update(currWeekCountQuery).promise() : '';
+        let prevWeekCountQueryStatus = prevWeekCountQuery ? dynamoDb.update(prevWeekCountQuery).promise() : '';
+
         let updatedData = await Promise.all([
             currMonthCountQueryStatus,
-            prevMonthCountQueryStatus
+            prevMonthCountQueryStatus,
+            currWeekCountQueryStatus,
+            prevWeekCountQueryStatus
         ]);
 
         return updatedData;
