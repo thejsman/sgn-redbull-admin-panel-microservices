@@ -2,25 +2,25 @@ import AWS from "aws-sdk";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 export const updateUserLoggedInActivityStats = async (payload) => {
     //waitlistedUser registration date, fetching it from payload
-    let { currDate, currMonth, prevDate, prevMonth, currDateCount, currMonthCount, prevDateCount, prevMonthCount, thisWeekNumber, yesterdayWeekNumber, thisWeekCount, prevWeekCount } = payload;
+    let { currDate, currMonth, prevDate, prevMonth, currDateCount, currMonthCount, prevDateCount, prevMonthCount, currWeek, prevWeek, currWeekCount, prevWeekCount } = payload;
     let prevMonthCountQuery = '';
     let currMonthCountQuery = '';
     let prevWeekCountQuery = '';
     let currWeekCountQuery = '';
     currMonthCountQuery = prepareUserLoggedInActivityStatsFetchQuery(currMonth, "allCounts");
-    currWeekCountQuery = prepareUserLoggedInActivityStatsFetchQuery(thisWeekNumber, "allCounts");
+    currWeekCountQuery = prepareUserLoggedInActivityStatsFetchQuery(currWeek, "allCounts");
 
     if (currMonth !== prevMonth) {
         prevMonthCountQuery = prepareUserLoggedInActivityStatsFetchQuery(prevMonth, "allCounts");
     }
-    if (thisWeekNumber !== yesterdayWeekNumber) {
-        prevWeekCountQuery = prepareUserLoggedInActivityStatsFetchQuery(yesterdayWeekNumber, "allCounts");
+    if (currWeek !== prevWeek) {
+        prevWeekCountQuery = prepareUserLoggedInActivityStatsFetchQuery(prevWeek, "allCounts");
     }
     try {
         let currMonthData = dynamoDb.query(currMonthCountQuery).promise();
         let currWeekData = dynamoDb.query(currWeekCountQuery).promise();
         let prevMonthData = ((currMonth !== prevMonth) && prevMonthCount) ? dynamoDb.query(prevMonthCountQuery).promise() : '';
-        let prevWeekData = ((thisWeekNumber !== yesterdayWeekNumber) && prevWeekCount) ? dynamoDb.query(prevWeekCountQuery).promise() : '';
+        let prevWeekData = ((currWeek !== prevWeek) && prevWeekCount) ? dynamoDb.query(prevWeekCountQuery).promise() : '';
         [currMonthData, prevMonthData] =
             await Promise.all([currMonthData, prevMonthData]);
         [currWeekData, prevWeekData] =
@@ -42,8 +42,8 @@ export const updateUserLoggedInActivityStats = async (payload) => {
         currMonthData = !currMonthData["count"] && currMonthCount > 0 || currMonthCount > currMonthData["count"] ? { ...currMonthData, "count": currMonthCount } : { ...currMonthData };
         prevMonthData = (currMonth != prevMonth) && (!prevMonthData[prevDate] && prevDateCount > 0 || prevMonthData[prevDate] && prevDateCount > prevMonthData[prevDate]["count"]) ? { ...prevMonthData, [prevDate]: { "date": prevDate, "count": prevDateCount } } : { ...prevMonthData };
         prevMonthData = (currMonth != prevMonth) && (!prevMonthData["count"] && prevMonthCount > 0 || prevMonthData["count"] && prevMonthCount > prevMonthData["count"]) ? { ...prevMonthData, "count": prevMonthCount } : { ...prevMonthData };
-        currWeekData = !currWeekData && thisWeekCount > 0 || thisWeekCount > currWeekData ? thisWeekCount : currWeekData;
-        prevWeekData = (thisWeekNumber != yesterdayWeekNumber) && (!prevWeekData && prevWeekCount > 0 || prevWeekData && prevWeekCount > prevWeekData) ? prevWeekCount : prevWeekData;
+        currWeekData = !currWeekData && currWeekCount > 0 || currWeekCount > currWeekData ? currWeekCount : currWeekData;
+        prevWeekData = (currWeek != prevWeek) && (!prevWeekData && prevWeekCount > 0 || prevWeekData && prevWeekCount > prevWeekData) ? prevWeekCount : prevWeekData;
 
         //Now update the data into DynamoDB
         //Now update the occasion data for perticular month & date
@@ -58,13 +58,13 @@ export const updateUserLoggedInActivityStats = async (payload) => {
             prevMonthData
         ) : '';
 
-        currWeekCountQuery = thisWeekCount > 0 || thisWeekCount > 0 ? prepareUserActivityLoggedInStatsUpdateQuery(
-            thisWeekNumber,
+        currWeekCountQuery = currWeekCount > 0 || currWeekCount > 0 ? prepareUserActivityLoggedInStatsUpdateQuery(
+            currWeek,
             "allCounts",
             currWeekData
         ) : '';
-        prevWeekCountQuery = prevWeekCount > 0 || ((thisWeekNumber != yesterdayWeekNumber) && prevWeekCount > 0) ? prepareUserActivityLoggedInStatsUpdateQuery(
-            yesterdayWeekNumber,
+        prevWeekCountQuery = prevWeekCount > 0 || ((currWeek != prevWeek) && prevWeekCount > 0) ? prepareUserActivityLoggedInStatsUpdateQuery(
+            prevWeek,
             "allCounts",
             prevWeekData
         ) : '';
