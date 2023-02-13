@@ -1,0 +1,7 @@
+UserAppLaunchDeliveryStreamIAM:
+  Effect: "Allow"
+  Action:
+    - firehose:*
+
+  Resource:
+    - Fn::GetAtt: [UserAppLaunchDeliveryStream, Arn]
