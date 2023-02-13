@@ -3,6 +3,7 @@ import { responseHandler } from "../lib/response";
 import { setRedisSets } from "redis-middleware";
 import { getUserFromToken } from "jwt-layer";
 import { weekNumber } from "../lib/dateUtils";
+import { putUserLoggedInActivityInFirehose } from "../lib/utils";
 
 const userLoggedIn = async (event, context) => {
   try {
@@ -28,6 +29,8 @@ const userLoggedIn = async (event, context) => {
     await setRedisSets(`${redisPrefixForDau}-${currDate}`, user.userId);
     await setRedisSets(`${redisPrefixForMau}-${currMonth}`, user.userId);
     await setRedisSets(`${redisPrefixForWau}-${currWeek}`, user.userId);
+    //put it in kinesis delivery stream
+    await putUserLoggedInActivityInFirehose(JSON.stringify({ 'uid': user.userId, 'ts': now.toISOString() }));
     let response = responseHandler({
       statusCode: 200,
       message: "Activity Registered"

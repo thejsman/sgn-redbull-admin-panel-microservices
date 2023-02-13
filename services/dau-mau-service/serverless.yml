@@ -26,6 +26,7 @@ provider:
       statements:
         - ${file(iam/UsersLoggedInActivityStatsTableIAM.yml):UsersLoggedInActivityStatsTableIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/FirehoseIAM.yml):FirehoseIAM}
 resources:
   Resources:
     UsersLoggedInActivityStatsTable: ${file(resources/UsersLoggedInActivityStatsTable.yml):UsersLoggedInActivityStatsTable}

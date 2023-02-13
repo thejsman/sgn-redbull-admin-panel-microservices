@@ -1,5 +1,6 @@
 import AWS from "aws-sdk";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const firehose = new AWS.Firehose();
 export const updateUserLoggedInActivityStats = async (payload) => {
     //waitlistedUser registration date, fetching it from payload
     let { currDate, currMonth, prevDate, prevMonth, currDateCount, currMonthCount, prevDateCount, prevMonthCount, currWeek, prevWeek, currWeekCount, prevWeekCount } = payload;
@@ -125,4 +126,19 @@ export const generateUpdateQuery = (fields) => {
     });
     exp.UpdateExpression = exp.UpdateExpression.replace(/(^,)|(,$)/g, "");
     return exp;
+};
+
+export const putUserLoggedInActivityInFirehose = async (data) => {
+    var params = {
+        DeliveryStreamName: 'admin-dau-mau-service-staging-userAppLaunch',
+        Record: {
+            Data: data + "\n"
+        }
+    };
+    try {
+        let firehoseResult = await firehose.putRecord(params).promise();
+        console.log('firehoseResult', firehoseResult);
+    } catch (e) {
+        console.log('error in firehose', e);
+    }
 };
