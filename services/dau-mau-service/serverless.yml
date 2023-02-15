@@ -68,7 +68,7 @@ custom:
 
   cronTime:
     dev: 1 hour
-    staging: 1 minute
+    staging: 1 hour
     prod: 1 hour
 
   authorizer:
