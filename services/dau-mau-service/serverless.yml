@@ -27,6 +27,7 @@ provider:
         - ${file(iam/UsersLoggedInActivityStatsTableIAM.yml):UsersLoggedInActivityStatsTableIAM}
         - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
         - ${file(iam/FirehoseIAM.yml):FirehoseIAM}
+        - ${file(iam/AthenaIAM.yml):AthenaIAM}
 resources:
   Resources:
     UsersLoggedInActivityStatsTable: ${file(resources/UsersLoggedInActivityStatsTable.yml):UsersLoggedInActivityStatsTable}
@@ -48,7 +49,10 @@ functions:
     handler: src/handlers/syncingDauMauInDb.handler
     events:
       - schedule: rate(${self:custom.cronTime.${sls:stage}})
-
+  runAthena:
+    handler: src/handlers/runAthena.handler
+    events:
+      - schedule: rate(${self:custom.cronTime.${sls:stage}})
 custom:
   domains:
     dev: dev.sagoonlite.com

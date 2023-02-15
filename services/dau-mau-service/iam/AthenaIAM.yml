@@ -1,0 +1,12 @@
+AthenaIAM:
+  Effect: "Allow"
+  Action:
+    - athena:StartQueryExecution
+    - s3:*
+    - glue:GetTable
+    - glue:GetPartitions
+  Resource:
+    - arn:aws:athena:${aws:region}:${aws:accountId}:*
+    - arn:aws:s3:::userloggedinactivity
+    - arn:aws:s3:::userloggedinactivity/*
+    - arn:aws:glue:${aws:region}:${aws:accountId}:*
