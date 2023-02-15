@@ -99,7 +99,7 @@ custom:
     dev: eu-central-1
     testing: ap-southeast-1
     staging: ap-southeast-1
-    prod: ap-southeast-1
+    prod: ap-south-1
 
   accessControlAllowOrigin:
     dev: "*"
@@ -110,6 +110,7 @@ custom:
   dataTransferredFromTo:
     dev: staging
     staging: prod
+    prod: staging
 
   customDomain:
     domainName: ${self:custom.domains.${sls:stage}}
