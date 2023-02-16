@@ -1,5 +1,5 @@
 import { getRedisItem, setRedisItem } from "redis-middleware";
-//import { updateUserLoggedInActivityStats } from "../lib/utils";
+import { updateUserLoggedInActivityStats } from "../lib/utils";
 import { weekNumber } from "../lib/dateUtils";
 import AWS from "aws-sdk";
 const athena = new AWS.Athena();
@@ -29,15 +29,14 @@ const syncingDauMauInDb = async (event, context) => {
     prevMonthQID = prevMonthQID.Payload ? JSON.parse(JSON.parse(prevMonthQID.Payload)) : '';
     currWeekQID = currWeekQID.Payload ? JSON.parse(JSON.parse(currWeekQID.Payload)) : '';
     prevWeekQID = prevWeekQID.Payload ? JSON.parse(JSON.parse(prevWeekQID.Payload)) : '';
-    prevDateQID = "8a9248e9-3503-462b-a576-a308b3263e2d";
     console.log('prevDateQID', currDateQID ? 3 : 4, prevDateQID ? 1 : 2, currMonthQID, prevMonthQID, currWeekQID, prevWeekQID);
     let [currDateAR, prevDateAR, currMonthAR, prevMonthAR, currWeekAR, prevWeekAR] = await Promise.all([
       currDateQID ? athena.getQueryResults({ QueryExecutionId: currDateQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForDau}-${currDate}`] : [...rcks]; }) : "",
       prevDateQID ? athena.getQueryResults({ QueryExecutionId: prevDateQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForDau}-${prevDate}`] : [...rcks]; }) : "",
       currMonthQID ? athena.getQueryResults({ QueryExecutionId: currMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForMau}-${currMonth}`] : [...rcks]; }) : "",
-      prevMonthQID ? athena.getQueryResults({ QueryExecutionId: prevMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForMau}-${prevMonth}`] : [...rcks]; }) : "",
+      prevMonthQID && currMonth != prevMonth ? athena.getQueryResults({ QueryExecutionId: prevMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForMau}-${prevMonth}`] : [...rcks]; }) : "",
       currWeekQID ? athena.getQueryResults({ QueryExecutionId: currWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForWau}-${currWeek}`] : [...rcks]; }) : "",
-      prevWeekQID ? athena.getQueryResults({ QueryExecutionId: prevWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForWau}-${prevWeek}`] : [...rcks]; }) : "",
+      prevWeekQID && currWeek != prevWeek ? athena.getQueryResults({ QueryExecutionId: prevWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForWau}-${prevWeek}`] : [...rcks]; }) : "",
     ]);
     currDateAR = currDateAR?.ResultSet?.Rows?.[1]?.Data?.[0]?.VarCharValue ?? 0;
     prevDateAR = prevDateAR?.ResultSet?.Rows?.[1]?.Data?.[0]?.VarCharValue ?? 0;
@@ -60,7 +59,7 @@ const syncingDauMauInDb = async (event, context) => {
     rcks = prevWeekAR ? [...rcks, `${redisPrefixForWau}-${prevWeek}`] : [...rcks];
     console.log('redis keys to be removed', rcks);
     //first extract the data from database
-    //await updateUserLoggedInActivityStats({ currDate, currMonth, prevDate, prevMonth, currDateCount: currDateAR, currMonthCount: currMonthAR, prevDateCount: prevDateAR, prevMonthCount: prevMonthAR, currWeek, prevWeek, currWeekCount: currWeekAR, prevWeekCount: prevWeekAR });
+    await updateUserLoggedInActivityStats({ currDate, currMonth, prevDate, prevMonth, currDateCount: +currDateAR, currMonthCount: +currMonthAR, prevDateCount: +prevDateAR, prevMonthCount: +prevMonthAR, currWeek, prevWeek, currWeekCount: +currWeekAR, prevWeekCount: +prevWeekAR });
     //Now set redis item ttl zero so that it will be deleted from redis
     await Promise.all(rcks.map(key => {
       console.log('key', key);
