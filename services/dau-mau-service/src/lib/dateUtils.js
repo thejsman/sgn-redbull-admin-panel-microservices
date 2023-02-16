@@ -37,3 +37,10 @@ export const weekNumber = (Tdate) => {
     return weekNumber;
 };
 
+
+export const datesOfTheWeek = (startDate) => {
+    return [1, 2, 3, 4, 5, 6, 7].map((x, y) => {
+        x = new Date(new Date().setDate((new Date(startDate).getDate() + y))).toISOString().slice(0, 10);
+        return x;
+    });
+};
