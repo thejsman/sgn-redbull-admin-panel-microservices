@@ -1,4 +1,5 @@
 import AWS from "aws-sdk";
+import { setRedisItem } from "redis-middleware";
 import { weekNumber, datesOfTheWeek } from "../lib/dateUtils";
 const athena = new AWS.Athena();
 const runAthena = async (event, context) => {
@@ -76,6 +77,14 @@ const runAthena = async (event, context) => {
     console.log('athenaResult---,prevMonthQR', prevMonthQR);
     console.log('athenaResult---,currWeekQR', currWeekQR);
     console.log('athenaResult---,prevWeekQR', prevWeekQR);
+
+    //Now put all Query execution ids in cache for later fecth the result
+    await Promise.all([currDateQR?.QueryExecutionId ? setRedisItem(`DAU-${currDate}`, 7200, currDateQR?.QueryExecutionId) : "",
+    prevDateQR?.QueryExecutionId ? setRedisItem(`DAU-${prevDate}`, 7200, prevDateQR?.QueryExecutionId) : "",
+    currMonthQR?.QueryExecutionId ? setRedisItem(`MAU-${currMonth}`, 7200, currMonthQR?.QueryExecutionId) : "",
+    prevMonthQR?.QueryExecutionId ? setRedisItem(`MAU-${prevMonth}`, 7200, prevMonthQR?.QueryExecutionId) : "",
+    currWeekQR?.QueryExecutionId ? setRedisItem(`WAU-${currWeek}`, 7200, currWeekQR?.QueryExecutionId) : "",
+    prevWeekQR?.QueryExecutionId ? setRedisItem(`WAU-${prevWeek}`, 7200, prevWeekQR?.QueryExecutionId) : ""]);
 
     //store this execution id in redis
     //await setRedisItem(redisCurrDateKey, 7200, athenaResult.QueryExecutionId);
