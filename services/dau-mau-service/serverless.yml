@@ -21,6 +21,8 @@ provider:
     STAGE: ${sls:stage}
     USERS_LOGGED_IN_ACTIVITY_STATS_TABLE: UsersLoggedInActivityStatsTable-${sls:stage}
     ACCESS_TOKEN_SECRET: ${self:custom.accessTokenSecret.${sls:stage}}
+    ATHENA_DB_DMW: ${self:custom.athenaDBDMW.${sls:stage}}
+    ATHENA_BUCKET_FOR_DMW: ${self:custom.athenaBucketForDMW.${sls:stage}}
   iam:
     role:
       statements:
@@ -48,11 +50,11 @@ functions:
   syncingDauMauInDb:
     handler: src/handlers/syncingDauMauInDb.handler
     events:
-      - schedule: rate(${self:custom.cronTime.${sls:stage}})
+      - schedule: rate(${self:custom.cronTimeToSyncDMWAUInDynamoDB.${sls:stage}})
   runAthena:
     handler: src/handlers/runAthena.handler
     events:
-      - schedule: rate(${self:custom.cronTime.${sls:stage}})
+      - schedule: rate(${self:custom.cronTimeToExecuteAthenaQuery.${sls:stage}})
 custom:
   domains:
     dev: dev.sagoonlite.com
@@ -66,10 +68,15 @@ custom:
     staging: ap-southeast-1
     prod: ap-south-1
 
-  cronTime:
+  cronTimeToExecuteAthenaQuery:
     dev: 1 hour
     staging: 1 hour
     prod: 1 hour
+
+  cronTimeToSyncDMWAUInDynamoDB:
+    dev: 30 minutes
+    staging: 30 minutes
+    prod: 30 minutes
 
   authorizer:
     name: VerifyTokenARN
@@ -83,6 +90,14 @@ custom:
     dev: 9
     staging: 1
     prod: 1
+  athenaDBDMW:
+    dev: test
+    staging: test
+    prod: DMWAU
+  athenaBucketForDMW:
+    dev: userloggedinactivity-${sls:stage}
+    staging: userloggedinactivity
+    prod: userloggedinactivity-${sls:stage}
 
   accessTokenSecret:
     dev: ${env:ACCESS_TOKEN_SECRET}

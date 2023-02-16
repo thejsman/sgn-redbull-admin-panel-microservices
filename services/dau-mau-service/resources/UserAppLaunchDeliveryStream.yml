@@ -4,7 +4,7 @@ UserAppLaunchDeliveryStream:
     DeliveryStreamName: ${self:service}-${self:provider.stage}-userAppLaunch
     DeliveryStreamType: DirectPut
     S3DestinationConfiguration:
-      BucketARN: arn:aws:s3:::userloggedinactivity
+      BucketARN: arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}
       BufferingHints:
         IntervalInSeconds: 300
         SizeInMBs: 5

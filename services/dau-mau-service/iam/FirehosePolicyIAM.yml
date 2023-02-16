@@ -10,5 +10,5 @@ FirehosePolicyIAM:
         - "s3:ListBucketMultipartUploads"
         - "s3:PutObject"
       Resource:
-        - !Sub "arn:aws:s3:::userloggedinactivity"
-        - !Sub "arn:aws:s3:::userloggedinactivity/*"
+        - !Sub "arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}"
+        - !Sub "arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}/*"

@@ -6,11 +6,11 @@ const runAthena = async (event, context) => {
   try {
     const params = {
       QueryExecutionContext: {
-        Database: "test"
+        Database: process.env.ATHENA_DB_DMW
       },
       QueryString: "",
       ResultConfiguration: {
-        OutputLocation: "s3://userloggedinactivity/"
+        OutputLocation: `s3://${process.env.ATHENA_BUCKET_FOR_DMW}/result`
       }
     };
     let now = new Date();
