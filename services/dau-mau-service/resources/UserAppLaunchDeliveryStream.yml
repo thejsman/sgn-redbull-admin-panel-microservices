@@ -1,7 +1,7 @@
 UserAppLaunchDeliveryStream:
   Type: AWS::KinesisFirehose::DeliveryStream
   Properties:
-    DeliveryStreamName: ${self:service}-${self:provider.stage}-userAppLaunch
+    DeliveryStreamName: ${self:provider.environment.FIREHOSE_DELIVERY_STREAM_DMW}
     DeliveryStreamType: DirectPut
     S3DestinationConfiguration:
       BucketARN: arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}

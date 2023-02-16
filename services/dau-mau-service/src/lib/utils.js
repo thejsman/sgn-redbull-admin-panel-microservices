@@ -130,7 +130,7 @@ export const generateUpdateQuery = (fields) => {
 
 export const putUserLoggedInActivityInFirehose = async (data) => {
     var params = {
-        DeliveryStreamName: 'admin-dau-mau-service-staging-userAppLaunch',
+        DeliveryStreamName: process.env.FIREHOSE_DELIVERY_STREAM_DMW,
         Record: {
             Data: data + "\n"
         }

@@ -23,6 +23,7 @@ provider:
     ACCESS_TOKEN_SECRET: ${self:custom.accessTokenSecret.${sls:stage}}
     ATHENA_DB_DMW: ${self:custom.athenaDBDMW.${sls:stage}}
     ATHENA_BUCKET_FOR_DMW: ${self:custom.athenaBucketForDMW.${sls:stage}}
+    FIREHOSE_DELIVERY_STREAM_DMW: userAppLaunch-${sls:stage}
   iam:
     role:
       statements:
