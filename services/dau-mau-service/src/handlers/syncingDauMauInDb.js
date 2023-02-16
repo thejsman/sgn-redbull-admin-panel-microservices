@@ -1,4 +1,4 @@
-import { getRedisItem } from "redis-middleware";
+import { getRedisItem, setRedisItem } from "redis-middleware";
 //import { updateUserLoggedInActivityStats } from "../lib/utils";
 import { weekNumber } from "../lib/dateUtils";
 import AWS from "aws-sdk";
@@ -32,12 +32,12 @@ const syncingDauMauInDb = async (event, context) => {
     prevDateQID = "8a9248e9-3503-462b-a576-a308b3263e2d";
     console.log('prevDateQID', currDateQID ? 3 : 4, prevDateQID ? 1 : 2, currMonthQID, prevMonthQID, currWeekQID, prevWeekQID);
     let [currDateAR, prevDateAR, currMonthAR, prevMonthAR, currWeekAR, prevWeekAR] = await Promise.all([
-      currDateQID ? athena.getQueryResults({ QueryExecutionId: currDateQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, currDateQID] : [...rcks]; }) : "",
-      prevDateQID ? athena.getQueryResults({ QueryExecutionId: prevDateQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, prevDateQID] : [...rcks]; }) : "",
-      currMonthQID ? athena.getQueryResults({ QueryExecutionId: currMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, currMonthQID] : [...rcks]; }) : "",
-      prevMonthQID ? athena.getQueryResults({ QueryExecutionId: prevMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, prevMonthQID] : [...rcks]; }) : "",
-      currWeekQID ? athena.getQueryResults({ QueryExecutionId: currWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, currWeekQID] : [...rcks]; }) : "",
-      prevWeekQID ? athena.getQueryResults({ QueryExecutionId: prevWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, prevWeekQID] : [...rcks]; }) : "",
+      currDateQID ? athena.getQueryResults({ QueryExecutionId: currDateQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForDau}-${currDate}`] : [...rcks]; }) : "",
+      prevDateQID ? athena.getQueryResults({ QueryExecutionId: prevDateQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForDau}-${prevDate}`] : [...rcks]; }) : "",
+      currMonthQID ? athena.getQueryResults({ QueryExecutionId: currMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForMau}-${currMonth}`] : [...rcks]; }) : "",
+      prevMonthQID ? athena.getQueryResults({ QueryExecutionId: prevMonthQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForMau}-${prevMonth}`] : [...rcks]; }) : "",
+      currWeekQID ? athena.getQueryResults({ QueryExecutionId: currWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForWau}-${currWeek}`] : [...rcks]; }) : "",
+      prevWeekQID ? athena.getQueryResults({ QueryExecutionId: prevWeekQID }).promise().catch(e => { rcks = e.message.includes('FAILED') ? [...rcks, `${redisPrefixForWau}-${prevWeek}`] : [...rcks]; }) : "",
     ]);
     currDateAR = currDateAR?.ResultSet?.Rows?.[1]?.Data?.[0]?.VarCharValue ?? 0;
     prevDateAR = prevDateAR?.ResultSet?.Rows?.[1]?.Data?.[0]?.VarCharValue ?? 0;
@@ -51,8 +51,21 @@ const syncingDauMauInDb = async (event, context) => {
     console.log('prevMonthQID', prevMonthAR);
     console.log('currWeekQID', currWeekAR);
     console.log('prevWeekQID', prevWeekAR);
+    //remove failed and suceed calls from cache also
+    rcks = currDateAR ? [...rcks, `${redisPrefixForDau}-${currDate}`] : [...rcks];
+    rcks = prevDateAR ? [...rcks, `${redisPrefixForDau}-${prevDate}`] : [...rcks];
+    rcks = currMonthAR ? [...rcks, `${redisPrefixForMau}-${currMonth}`] : [...rcks];
+    rcks = prevMonthAR ? [...rcks, `${redisPrefixForMau}-${prevMonth}`] : [...rcks];
+    rcks = currWeekAR ? [...rcks, `${redisPrefixForWau}-${currWeek}`] : [...rcks];
+    rcks = prevWeekAR ? [...rcks, `${redisPrefixForWau}-${prevWeek}`] : [...rcks];
+    console.log('redis keys to be removed', rcks);
     //first extract the data from database
-    // await updateUserLoggedInActivityStats({ currDate, currMonth, prevDate, prevMonth, currDateCount: currDateData && currDateData.length > 0 ? currDateData.length : 0, currMonthCount: currMonthData && currMonthData.length > 0 ? currMonthData.length : 0, prevDateCount: prevDateData && prevDateData.length > 0 ? prevDateData.length : 0, prevMonthCount: prevMonthData && prevMonthData.length ? prevMonthData.length : 0, currWeek, prevWeek, currWeekCount: currWeekData && currWeekData.length ? currWeekData.length : 0, prevWeekCount: prevWeekData && prevWeekData.length ? prevWeekData.length : 0 });
+    //await updateUserLoggedInActivityStats({ currDate, currMonth, prevDate, prevMonth, currDateCount: currDateAR, currMonthCount: currMonthAR, prevDateCount: prevDateAR, prevMonthCount: prevMonthAR, currWeek, prevWeek, currWeekCount: currWeekAR, prevWeekCount: prevWeekAR });
+    //Now set redis item ttl zero so that it will be deleted from redis
+    await Promise.all(rcks.map(key => {
+      console.log('key', key);
+      return setRedisItem(key, 10, 'ToBeDeleted');
+    }));
   } catch (error) {
     console.log("error", error);
   }
