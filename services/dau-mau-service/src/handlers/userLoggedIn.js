@@ -23,7 +23,7 @@ const userLoggedIn = async (event, context) => {
     //await setRedisSets(`${redisPrefixForMau}-${currMonth}`, user.userId);
     // await setRedisSets(`${redisPrefixForWau}-${currWeek}`, user.userId);
     //put it in kinesis delivery stream
-    await putUserLoggedInActivityInFirehose(JSON.stringify({ 'uid': user.userId, 'ts': now.toISOString(), 'ev': type }));
+    await putUserLoggedInActivityInFirehose(JSON.stringify({ 'uid': user.userId, 'ts': now.getTime(), 'ev': type }));
     let response = responseHandler({
       statusCode: 200,
       message: "Activity Registered"

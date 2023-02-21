@@ -20,23 +20,23 @@ const runAthena = async (event, context) => {
     currDateQuery = prevDateQuery = currMonthQuery = prevMonthQuery = currWeekQuery = prevWeekQuery = "";
     //prepare query for currDate
     currDate = now.toISOString().slice(0, 10);
-    currDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where year=${currDate.slice(0, 4)} and month=${currDate.slice(5, 7)} and day=${currDate.slice(8, 10)} group by uid)` };
+    currDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(currDate, 'daily')} group by uid)` };
     //check if hour is between 0,2 then run a query on prevDate also as we are assumingafter 12AM it will run for last day also once
-    if (now.getHours() > 1 && now.getHours() < 24) {
+    if (now.getHours() > 1 && now.getHours() < 3) {
       prevDate = new Date(now.setDate(now.getDate() - 1));
       prevDate = prevDate.toISOString().slice(0, 10);
-      prevDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where year=${prevDate.slice(0, 4)} and month=${prevDate.slice(5, 7)} and day=${prevDate.slice(8, 10)} group by uid)` };
+      prevDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(prevDate, 'daily')} group by uid)` };
     }
     //for current month but we will run it only once in the night between 1, 2'o clock
     now = new Date();
-    if (now.getHours() > 1 && now.getHours() < 24) {
+    if (now.getHours() > 1 && now.getHours() < 3) {
       currMonth = now.toISOString().slice(0, 7);
-      currMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where year=${prevDate.slice(0, 4)} and month=${prevDate.slice(5, 7)} group by uid)` };
+      currMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(currMonth, 'monthly')} group by uid)` };
       //check if prev month is diffrent from current month
       prevMonth = new Date(now.setDate(now.getDate() - 1));
       prevMonth = prevMonth.toISOString().slice(0, 7);
       if (currMonth != prevMonth) {
-        prevMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where year=${prevMonth.slice(0, 4)} and month=${prevMonth.slice(5, 7)} group by uid)` };
+        prevMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(prevMonth, 'monthly')}  group by uid)` };
       }
       //now same for week first update for current week
       now = new Date();
@@ -46,7 +46,7 @@ const runAthena = async (event, context) => {
         currWeekQuery = datesOfTheWeek(currWeek.slice(0, 10)).map(cDate => {
           return `year=${cDate.slice(0, 4)} and month=${cDate.slice(5, 7)} and day=${cDate.slice(8, 10)}`;
         }).join(' or ');
-      currWeekQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${currWeekQuery} group by uid)` };
+      currWeekQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareWeeklyQuery(currWeek, currWeekQuery)} group by uid)` };
       //check previous week
       prevWeek = weekNumber(new Date(now.setDate(now.getDate() - 1)).toISOString().slice(0, 10));
       if (currWeek != prevWeek) {
@@ -54,7 +54,7 @@ const runAthena = async (event, context) => {
           prevWeekQuery = datesOfTheWeek(prevWeek.slice(0, 10)).map(cDate => {
             return `year=${cDate.slice(0, 4)} and month=${cDate.slice(5, 7)} and day=${cDate.slice(8, 10)}`;
           }).join(' or ');
-        prevWeekQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prevWeekQuery} group by uid)` };
+        prevWeekQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareWeeklyQuery(prevWeek, prevWeekQuery)} group by uid)` };
 
       }
     }
@@ -90,6 +90,40 @@ const runAthena = async (event, context) => {
     console.log("error", error);
 
   }
+};
+
+const prepareQuery = (date, term) => {
+  let query = '';
+  let lastDate = new Date(new Date(date).setDate(new Date(date).getDate() - 1)).toISOString();
+  let nextDate = new Date(new Date(date).setDate(new Date(date).getDate() + 1)).toISOString();
+  let tsFrom = new Date(date).getTime() - 19800000;
+  let tsTo = new Date(nextDate).getTime() - 19800000;
+
+  switch (term) {
+    case "daily":
+      query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} and day=${date.slice(8, 10)} or year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)}) and ts >=${tsFrom} and ts < ${tsTo}`;
+      break;
+    case "monthly":
+      tsFrom = new Date(`${date.slice(0, 4)}-${date.slice(5, 7)}-01`).getTime() - 19800000;
+      let tsFromMonth = new Date(tsFrom).toISOString();
+      tsTo = new Date(`${date.slice(0, 4)}-${date.slice(5, 7)}-01`).setMonth(new Date(`${date.slice(0, 4)}-${date.slice(5, 7)}-01`).getMonth() + 1) - 19800000;
+
+      console.log('tsfrom', tsFrom, tsTo);
+      query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} or year=${tsFromMonth.slice(0, 4)} and month=${tsFromMonth.slice(5, 7)} and day=${tsFromMonth.slice(8, 10)}) and ts > ${tsFrom} and ts<${tsTo}`;
+      break;
+    default:
+      break;
+  }
+  return query;
+};
+
+const prepareWeeklyQuery = (weekNum, query) => {
+  let lastDate = new Date(new Date(weekNum.slice(0, 10)).setDate(new Date(weekNum.slice(0, 10)).getDate() - 1)).toISOString();
+  let nextDate = new Date(new Date(weekNum.slice(-10)).setDate(new Date(weekNum.slice(-10)).getDate() + 1)).toISOString();
+  let tsFrom = new Date(weekNum.slice(0, 10)).getTime() - 19800000;
+  let tsTo = new Date(nextDate).getTime() - 19800000;
+  return `(year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)} or ${query}) and ts>${tsFrom} and ts<${tsTo}`;
+
 };
 
 export const handler = runAthena;
