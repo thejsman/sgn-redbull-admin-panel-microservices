@@ -7,10 +7,10 @@ const athena = new AWS.Athena();
 const syncingDauMauInDb = async (event, context) => {
   try {
     //get today date and also previous date and extract the data from redis and store in dynmo
-    const redisPrefixForDau = 'DAUC';
-    const redisPrefixForMau = 'MAUC';
-    const redisPrefixForWau = 'WAUC';
-    const now = new Date();
+    const redisPrefixForDau = 'DAU';
+    const redisPrefixForMau = 'MAU';
+    const redisPrefixForWau = 'WAU';
+    const now = new Date(new Date().getTime() + 19800000);
     let currDate = now.toISOString().slice(0, 10);
     let currMonth = now.toISOString().slice(0, 7);
     let yesterday = new Date(now.setDate(now.getDate() - 1));

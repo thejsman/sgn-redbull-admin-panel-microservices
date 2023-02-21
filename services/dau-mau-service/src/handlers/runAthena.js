@@ -13,7 +13,7 @@ const runAthena = async (event, context) => {
         OutputLocation: `s3://${process.env.ATHENA_BUCKET_FOR_DMW}/result`
       }
     };
-    let now = new Date();
+    let now = new Date(new Date().getTime() + 19800000);
     let currDate, prevDate, currMonth, prevMonth, currWeek, prevWeek;
     currDate = prevDate = currMonth = prevMonth = currWeek = prevWeek = "";
     let currDateQuery, prevDateQuery, currMonthQuery, prevMonthQuery, currWeekQuery, prevWeekQuery;
@@ -28,7 +28,7 @@ const runAthena = async (event, context) => {
       prevDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(prevDate, 'daily')} group by uid)` };
     }
     //for current month but we will run it only once in the night between 1, 2'o clock
-    now = new Date();
+    now = new Date(new Date().getTime() + 19800000);
     if (now.getHours() > 8 && now.getHours() < 10) {
       currMonth = now.toISOString().slice(0, 7);
       currMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(currMonth, 'monthly')} group by uid)` };
@@ -39,7 +39,7 @@ const runAthena = async (event, context) => {
         prevMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(prevMonth, 'monthly')}  group by uid)` };
       }
       //now same for week first update for current week
-      now = new Date();
+      now = new Date(new Date().getTime() + 19800000);
       currWeek = weekNumber(now);
 
       currWeekQuery =
@@ -79,12 +79,12 @@ const runAthena = async (event, context) => {
     console.log('athenaResult---,prevWeekQR', prevWeekQR);
 
     //Now put all Query execution ids in cache for later fecth the result
-    await Promise.all([currDateQR?.QueryExecutionId ? setRedisItem(`DAUC-${currDate}`, 7200, currDateQR?.QueryExecutionId) : "",
-    prevDateQR?.QueryExecutionId ? setRedisItem(`DAUC-${prevDate}`, 7200, prevDateQR?.QueryExecutionId) : "",
-    currMonthQR?.QueryExecutionId ? setRedisItem(`MAUC-${currMonth}`, 7200, currMonthQR?.QueryExecutionId) : "",
-    prevMonthQR?.QueryExecutionId ? setRedisItem(`MAUC-${prevMonth}`, 7200, prevMonthQR?.QueryExecutionId) : "",
-    currWeekQR?.QueryExecutionId ? setRedisItem(`WAUC-${currWeek}`, 7200, currWeekQR?.QueryExecutionId) : "",
-    prevWeekQR?.QueryExecutionId ? setRedisItem(`WAUC-${prevWeek}`, 7200, prevWeekQR?.QueryExecutionId) : ""]);
+    await Promise.all([currDateQR?.QueryExecutionId ? setRedisItem(`DAU-${currDate}`, 7200, currDateQR?.QueryExecutionId) : "",
+    prevDateQR?.QueryExecutionId ? setRedisItem(`DAU-${prevDate}`, 7200, prevDateQR?.QueryExecutionId) : "",
+    currMonthQR?.QueryExecutionId ? setRedisItem(`MAU-${currMonth}`, 7200, currMonthQR?.QueryExecutionId) : "",
+    prevMonthQR?.QueryExecutionId ? setRedisItem(`MAU-${prevMonth}`, 7200, prevMonthQR?.QueryExecutionId) : "",
+    currWeekQR?.QueryExecutionId ? setRedisItem(`WAU-${currWeek}`, 7200, currWeekQR?.QueryExecutionId) : "",
+    prevWeekQR?.QueryExecutionId ? setRedisItem(`WAU-${prevWeek}`, 7200, prevWeekQR?.QueryExecutionId) : ""]);
 
   } catch (error) {
     console.log("error", error);
