@@ -22,14 +22,14 @@ const runAthena = async (event, context) => {
     currDate = now.toISOString().slice(0, 10);
     currDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(currDate, 'daily')} group by uid)` };
     //check if hour is between 0,2 then run a query on prevDate also as we are assumingafter 12AM it will run for last day also once
-    if (now.getHours() > 1 && now.getHours() < 3) {
+    if (now.getHours() > 8 && now.getHours() < 10) {
       prevDate = new Date(now.setDate(now.getDate() - 1));
       prevDate = prevDate.toISOString().slice(0, 10);
       prevDateQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(prevDate, 'daily')} group by uid)` };
     }
     //for current month but we will run it only once in the night between 1, 2'o clock
     now = new Date();
-    if (now.getHours() > 1 && now.getHours() < 3) {
+    if (now.getHours() > 8 && now.getHours() < 10) {
       currMonth = now.toISOString().slice(0, 7);
       currMonthQuery = { ...params, QueryString: `select count(*) from (select count(*) from loggedin_data where ${prepareQuery(currMonth, 'monthly')} group by uid)` };
       //check if prev month is diffrent from current month
