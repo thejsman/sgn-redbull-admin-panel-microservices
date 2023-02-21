@@ -101,7 +101,7 @@ const prepareQuery = (date, term) => {
 
   switch (term) {
     case "daily":
-      query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} and day=${date.slice(8, 10)} or year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)}) and ts >=${tsFrom} and ts < ${tsTo}`;
+      query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} and day=${date.slice(8, 10)} or year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)}) and ts >='${tsFrom}' and ts < '${tsTo}'`;
       break;
     case "monthly":
       tsFrom = new Date(`${date.slice(0, 4)}-${date.slice(5, 7)}-01`).getTime() - 19800000;
@@ -109,7 +109,7 @@ const prepareQuery = (date, term) => {
       tsTo = new Date(`${date.slice(0, 4)}-${date.slice(5, 7)}-01`).setMonth(new Date(`${date.slice(0, 4)}-${date.slice(5, 7)}-01`).getMonth() + 1) - 19800000;
 
       console.log('tsfrom', tsFrom, tsTo);
-      query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} or year=${tsFromMonth.slice(0, 4)} and month=${tsFromMonth.slice(5, 7)} and day=${tsFromMonth.slice(8, 10)}) and ts > ${tsFrom} and ts<${tsTo}`;
+      query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} or year=${tsFromMonth.slice(0, 4)} and month=${tsFromMonth.slice(5, 7)} and day=${tsFromMonth.slice(8, 10)}) and ts > '${tsFrom}' and ts<'${tsTo}'`;
       break;
     default:
       break;
@@ -122,7 +122,7 @@ const prepareWeeklyQuery = (weekNum, query) => {
   let nextDate = new Date(new Date(weekNum.slice(-10)).setDate(new Date(weekNum.slice(-10)).getDate() + 1)).toISOString();
   let tsFrom = new Date(weekNum.slice(0, 10)).getTime() - 19800000;
   let tsTo = new Date(nextDate).getTime() - 19800000;
-  return `(year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)} or ${query}) and ts>${tsFrom} and ts<${tsTo}`;
+  return `(year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)} or ${query}) and ts>'${tsFrom}' and ts<'${tsTo}'`;
 
 };
 
