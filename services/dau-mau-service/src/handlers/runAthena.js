@@ -14,6 +14,7 @@ const runAthena = async (event, context) => {
       }
     };
     let now = new Date(new Date().getTime() + 19800000);
+    console.log('now.getHours()', process.env.TZ, new Date(), now.getHours(), now.getTime(), new Date().getTime(), now.toISOString());
     let currDate, prevDate, currMonth, prevMonth, currWeek, prevWeek;
     currDate = prevDate = currMonth = prevMonth = currWeek = prevWeek = "";
     let currDateQuery, prevDateQuery, currMonthQuery, prevMonthQuery, currWeekQuery, prevWeekQuery;
@@ -41,7 +42,7 @@ const runAthena = async (event, context) => {
       //now same for week first update for current week
       now = new Date(new Date().getTime() + 19800000);
       currWeek = weekNumber(now);
-
+      console.log('new Date(now.setDate(now.getDate() - 1)).toISOString()', new Date(now.setDate(now.getDate() - 1)).toISOString());
       currWeekQuery =
         currWeekQuery = datesOfTheWeek(currWeek.slice(0, 10)).map(cDate => {
           return `year=${cDate.slice(0, 4)} and month=${cDate.slice(5, 7)} and day=${cDate.slice(8, 10)}`;
@@ -58,7 +59,7 @@ const runAthena = async (event, context) => {
 
       }
     }
-    console.log("currDateQuery", currDateQuery, "prevDateQuery", prevDateQuery);
+    console.log("currDateQuery", currDateQuery, "prevDateQuery", prevDateQuery, currMonthQuery, prevMonthQuery, currWeekQuery);
 
     //Now execute the query to athena
     let [currDateQR, prevDateQR, currMonthQR, prevMonthQR, currWeekQR, prevWeekQR] = await Promise.all([
@@ -98,7 +99,7 @@ const prepareQuery = (date, term) => {
   let nextDate = new Date(new Date(date).setDate(new Date(date).getDate() + 1)).toISOString();
   let tsFrom = new Date(date).getTime() - 19800000;
   let tsTo = new Date(nextDate).getTime() - 19800000;
-
+  console.log('=> tsFrom new Date(date).getTime()', date, new Date(date).getTime());
   switch (term) {
     case "daily":
       query = `(year=${date.slice(0, 4)} and month=${date.slice(5, 7)} and day=${date.slice(8, 10)} or year=${lastDate.slice(0, 4)} and month=${lastDate.slice(5, 7)} and day=${lastDate.slice(8, 10)}) and ts >='${tsFrom}' and ts < '${tsTo}'`;

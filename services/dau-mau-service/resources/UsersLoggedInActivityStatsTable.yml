@@ -1,5 +1,6 @@
 UsersLoggedInActivityStatsTable:
   Type: AWS::DynamoDB::Table
+  DeletionPolicy: Retain
   Properties:
     AttributeDefinitions:
       - AttributeName: pk

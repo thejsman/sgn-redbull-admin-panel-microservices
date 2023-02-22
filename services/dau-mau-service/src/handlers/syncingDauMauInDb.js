@@ -19,10 +19,11 @@ const syncingDauMauInDb = async (event, context) => {
     let currWeek = weekNumber(currDate);
     let prevWeek = weekNumber(yesterday);
     let rcks = []; //cache keys to be removed
-
+    console.log('now', now.toISOString(), yesterday.toISOString());
 
     //Now extract the infofrom redis for these 4 parameters
     let [currDateQID, prevDateQID, currMonthQID, prevMonthQID, currWeekQID, prevWeekQID] = await Promise.all([getRedisItem(`${redisPrefixForDau}-${currDate}`), getRedisItem(`${redisPrefixForDau}-${prevDate}`), getRedisItem(`${redisPrefixForMau}-${currMonth}`), getRedisItem(`${redisPrefixForMau}-${prevMonth}`), getRedisItem(`${redisPrefixForWau}-${currWeek}`), getRedisItem(`${redisPrefixForWau}-${prevWeek}`)]);
+    console.log('prevDateQID', currDateQID ? 3 : 4, prevDateQID ? 1 : 2, currMonthQID, prevMonthQID, currWeekQID, prevWeekQID);
     currDateQID = currDateQID.Payload ? JSON.parse(JSON.parse(currDateQID.Payload)) : '';
     prevDateQID = prevDateQID.Payload ? JSON.parse(JSON.parse(prevDateQID.Payload)) : '';
     currMonthQID = currMonthQID.Payload ? JSON.parse(JSON.parse(currMonthQID.Payload)) : '';
