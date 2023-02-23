@@ -94,11 +94,11 @@ custom:
   athenaDBDMW:
     dev: test
     staging: test
-    prod: DMWAU
+    prod: sagoon-data-analytics
   athenaBucketForDMW:
     dev: userloggedinactivity-${sls:stage}
     staging: userloggedinactivity
-    prod: userloggedinactivity-${sls:stage}
+    prod: ${sls:stage}-user-analytics
 
   accessTokenSecret:
     dev: ${env:ACCESS_TOKEN_SECRET}
