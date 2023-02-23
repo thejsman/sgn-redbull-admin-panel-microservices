@@ -1,0 +1,12 @@
+UserAppLaunchDeliveryStream:
+  Type: AWS::KinesisFirehose::DeliveryStream
+  Properties:
+    DeliveryStreamName: ${self:provider.environment.FIREHOSE_DELIVERY_STREAM_DMW}
+    DeliveryStreamType: DirectPut
+    S3DestinationConfiguration:
+      BucketARN: arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}
+      BufferingHints:
+        IntervalInSeconds: 300
+        SizeInMBs: 5
+      CompressionFormat: UNCOMPRESSED
+      RoleARN: !GetAtt FirehoseRole.Arn

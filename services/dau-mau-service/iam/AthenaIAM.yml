@@ -1,0 +1,14 @@
+AthenaIAM:
+  Effect: "Allow"
+  Action:
+    - athena:StartQueryExecution
+    - s3:*
+    - glue:GetTable
+    - glue:GetPartitions
+    - athena:GetQueryExecution
+    - athena:GetQueryResults
+  Resource:
+    - arn:aws:athena:${aws:region}:${aws:accountId}:*
+    - arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}
+    - arn:aws:s3:::${self:provider.environment.ATHENA_BUCKET_FOR_DMW}/*
+    - arn:aws:glue:${aws:region}:${aws:accountId}:*

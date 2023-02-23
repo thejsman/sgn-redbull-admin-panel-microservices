@@ -1,0 +1,117 @@
+service: admin-dau-mau-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.region.${sls:stage}}
+  layers:
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:jwt-layer:${self:custom.jwtLayerVersion.${sls:stage}}
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:common-middleware-layer:${self:custom.commonMiddlewareLayerVersion.${sls:stage}}
+  environment:
+    REGION: ${self:provider.region}
+    ACCESS_CONTROL_ALLOW_ORIGIN: ${self.custom.accessControlAllowOrigin.${sls:stage}}
+    STAGE: ${sls:stage}
+    USERS_LOGGED_IN_ACTIVITY_STATS_TABLE: UsersLoggedInActivityStatsTable-${sls:stage}
+    ACCESS_TOKEN_SECRET: ${self:custom.accessTokenSecret.${sls:stage}}
+    ATHENA_DB_DMW: ${self:custom.athenaDBDMW.${sls:stage}}
+    ATHENA_BUCKET_FOR_DMW: ${self:custom.athenaBucketForDMW.${sls:stage}}
+    FIREHOSE_DELIVERY_STREAM_DMW: userAppLaunch-${sls:stage}
+  iam:
+    role:
+      statements:
+        - ${file(iam/UsersLoggedInActivityStatsTableIAM.yml):UsersLoggedInActivityStatsTableIAM}
+        - ${file(iam/InvokeLambdaIAM.yml):InvokeLambdaIAM}
+        - ${file(iam/FirehoseIAM.yml):FirehoseIAM}
+        - ${file(iam/AthenaIAM.yml):AthenaIAM}
+resources:
+  Resources:
+    UsersLoggedInActivityStatsTable: ${file(resources/UsersLoggedInActivityStatsTable.yml):UsersLoggedInActivityStatsTable}
+    FirehoseRole: ${file(resources/FirehoseRole.yml):FirehoseRole}
+    FirehosePolicy: ${file(resources/FirehosePolicy.yml):FirehosePolicy}
+    UserAppLaunchDeliveryStream: ${file(resources/UserAppLaunchDeliveryStream.yml):UserAppLaunchDeliveryStream}
+
+functions:
+  userLoggedIn:
+    handler: src/handlers/userLoggedIn.handler
+    timeout: 30
+    events:
+      - http:
+          method: POST
+          path: /appLaunch
+          cors: true
+          authorizer: ${self:custom.authorizer}
+  syncingDauMauInDb:
+    handler: src/handlers/syncingDauMauInDb.handler
+    events:
+      - schedule: rate(${self:custom.cronTimeToSyncDMWAUInDynamoDB.${sls:stage}})
+  runAthena:
+    handler: src/handlers/runAthena.handler
+    events:
+      - schedule: rate(${self:custom.cronTimeToExecuteAthenaQuery.${sls:stage}})
+custom:
+  domains:
+    dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  cronTimeToExecuteAthenaQuery:
+    dev: 1 hour
+    staging: 1 hour
+    prod: 1 hour
+
+  cronTimeToSyncDMWAUInDynamoDB:
+    dev: 30 minutes
+    staging: 30 minutes
+    prod: 30 minutes
+
+  authorizer:
+    name: VerifyTokenARN
+    arn:
+      Fn::ImportValue: VerifyTokenARN
+  jwtLayerVersion:
+    dev: 8
+    staging: 1
+    prod: 1
+  commonMiddlewareLayerVersion:
+    dev: 9
+    staging: 1
+    prod: 1
+  athenaDBDMW:
+    dev: test
+    staging: test
+    prod: DMWAU
+  athenaBucketForDMW:
+    dev: userloggedinactivity-${sls:stage}
+    staging: userloggedinactivity
+    prod: userloggedinactivity-${sls:stage}
+
+  accessTokenSecret:
+    dev: ${env:ACCESS_TOKEN_SECRET}
+    staging: ${env:ACCESS_TOKEN_SECRET}
+    prod: ${env:ACCESS_TOKEN_SECRET_PROD}
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: userAnalytics
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge
+
+  bundle:
+    forceExclude: ["jwt-layer", "common-middleware-layer"]

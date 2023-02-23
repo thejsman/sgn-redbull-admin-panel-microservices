@@ -166,3 +166,22 @@ export const removeSetMember = (key, value) => {
 		}
 	});
 };
+
+export const getRedisSet = (key) => {
+	return new Promise(async (resolve, reject) => {
+		try {
+			const item = await lambda
+				.invoke({
+					FunctionName: `redis-service-${process.env.STAGE}-getRedisSet`,
+					Payload: JSON.stringify({ key }, null, 2),
+				})
+				.promise();
+
+			resolve(item);
+		} catch (error) {
+			console.log("error in getRedisSet", error);
+			reject(error);
+		}
+	});
+};
+
