@@ -69,6 +69,8 @@ async function AddOccasion(event, context) {
     let UpdateExpression = [];
     let ExpressionAttributeValues = {};
     let ExpressionAttributeNames = {};
+    //add a GSI value occasionCumStatus extra
+    data = data.occasionStatus ? { ...data, occasionCumStatus: `${occasionIdentifier}#true` } : { ...data, occasionCumStatus: `${occasionIdentifier}#false` };
     for (let key in data) {
       UpdateExpression.push(`#${key} = :${key}`);
       ExpressionAttributeValues[`:${key}`] = data[key];

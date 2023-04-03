@@ -8,6 +8,8 @@ OccasionIconTable:
         AttributeType: S
       - AttributeName: displayOrder
         AttributeType: N
+      - AttributeName: occasionCumStatus
+        AttributeType: S
     KeySchema:
       - AttributeName: occasionIdentifier
         KeyType: HASH
@@ -17,6 +19,15 @@ OccasionIconTable:
       - IndexName: occasion_order-Index
         KeySchema:
           - AttributeName: occasionIdentifier
+            KeyType: HASH
+          - AttributeName: displayOrder
+            KeyType: RANGE
+        Projection:
+          ProjectionType: "ALL"
+    GlobalSecondaryIndexes:
+      - IndexName: occasion_status_order-Index
+        KeySchema:
+          - AttributeName: occasionCumStatus
             KeyType: HASH
           - AttributeName: displayOrder
             KeyType: RANGE
