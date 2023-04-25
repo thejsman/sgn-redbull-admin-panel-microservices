@@ -1,0 +1,13 @@
+LCOccasionMessageTableIAM:
+  Effect: "Allow"
+  Action:
+    - dynamodb:Query
+    - dynamodb:GetItem
+    - dynamodb:PutItem
+    - dynamodb:UpdateItem
+    - dynamodb:DeleteItem
+    - dynamodb:Scan
+
+  Resource:
+    - Fn::GetAtt: [LCOccasionMessageTable, Arn]
+    - Fn::Join: ["/", ["Fn::GetAtt": [LCOccasionMessageTable, Arn], "index", "*"]]

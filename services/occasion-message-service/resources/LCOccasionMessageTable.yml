@@ -1,0 +1,15 @@
+LCOccasionMessageTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: occasionName
+        AttributeType: S
+      - AttributeName: displayOrder
+        AttributeType: N
+    KeySchema:
+      - AttributeName: occasionName
+        KeyType: HASH
+      - AttributeName: displayOrder
+        KeyType: RANGE
+    BillingMode: PAY_PER_REQUEST
+    TableName: ${self:provider.environment.LC_OCCASION_MESSAGE_TABLE}
