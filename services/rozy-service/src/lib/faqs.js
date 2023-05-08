@@ -2,56 +2,65 @@ export const rozyFaqs = [
   {
     id: 1,
     question:
-      "I've earned a lot of Sagoon smart coins in the past. What is the status of my coins?",
+      "I earned Smart coins, but they are not showing up in the latest app update. What should I do?",
     answer:
-      "Your smart coins are safe in our records. We're introducing a new Social Smart Card soon. Then you'll be able to see your smart coins and use them for shopping and gifting on Sagoon.",
+      "Smart coins earned by users may not be visible in the latest version of the app. They will be reflected in the upcoming updates when we launch the Smart Card. Contact support@sagoon.com for further assistance.",
   },
-  // {
-  // 	id: 2,
-  // 	question: "How do I log into the new Sagoon?",
-  // 	answer:
-  // 		"Sagoon is now an invite-only platform. You'll need an invitation code to log into the new Sagoon. We're continuously sending invitation codes to all our old users in India and Nepal. Please check your email or SMS. If you missed your invitation code, please send us your registered mobile number at support@sagoon.com",
-  // },
   {
     id: 2,
-    question: "Any rewards for using the new Sagoon app?",
+    question: "How can I earn cash rewards on the Sagoon app?",
     answer:
-      "Yes. We are offering daily cash rewards. You can play games and win rewards. With your rewards, you can buy daily deals and send gifts to your loved ones.",
+      "Users can earn cash rewards by playing the 'scratch and win' game once a day in the Sagoon app",
   },
   {
     id: 3,
-    question: "How can I earn smart coins on the new Sagoon app?",
+    question: "How can I earn Smart coins on the new Sagoon app?",
     answer:
-      "Currently, you won't be able to earn smart coins. Once we release the Social Smart Card, you'll learn how to earn and use them.",
+      "Currently, Smart coins cannot be earned on the latest version of the Sagoon app. Stay tuned for updates regarding the Social Smart Card.",
   },
   {
     id: 4,
-    question: "How do I pay for the deals or gifts I purchase?",
+    question: "How can users use my reward balance on Sagoon?",
     answer:
-      "You can purchase deals or gifts by using cash rewards, wallets or debit/credit cards.",
+      "Users can use their reward balance to purchase daily deals on Sagoon.",
   },
   {
     id: 5,
-    question: "What are the locations I can send gifts to?",
+    question: 'What is "Today\'s deal" on Sagoon?',
     answer:
-      "With our recent release, the deals and gifts are available only in India and Nepal.",
+      '"Today\'s deal" is a daily deal offered by Sagoon, which provides users with a chance to purchase a highly discounted product or digital voucher. Users can access it in the “Store” section of the app.',
   },
   {
     id: 6,
-    question: "What is the return/refund policy for gifts?",
+    question:
+      "Who can purchase and send gifts on the Sagoon app, and to which countries?",
     answer:
-      "Sagoon does not have any return policy. However, if you receive any item damaged during delivery, we will replace the item. Please record a video of opening the box and share it with us at support@sagoon.com",
+      "Users from India and Nepal can purchase gifts on the Sagoon app and send them to their loved ones who are either in India or Nepal.",
   },
   {
     id: 7,
-    question: "Can I cancel my order?",
-    answer: "No, you cannot cancel your order.",
+    question: "How do I pay for the deals or gifts I purchase?",
+    answer:
+      "You can purchase deals or gifts by using cash rewards, wallets, or debit/credit cards.",
   },
   {
     id: 8,
-    question: "Can I, as a retail vendor, become a partner with Sagoon?",
+    question:
+      "What is the return/refund policy for gifts and deals purchased on Sagoon?",
     answer:
-      "Yes, we are happy to discuss the benefits of our partnership. Please contact us at support@sagoon.com or visit our office location.",
+      "Sagoon does not have a return policy for gifts and deals purchased on our platform. However, we will replace a damaged item during delivery.",
+  },
+  {
+    id: 9,
+    question:
+      "What is the process for a refund if my transaction is failed or is invalid?",
+    answer:
+      "Sagoon will automatically initiate the refund process if your transaction fails or is invalid.",
+  },
+  {
+    id: 10,
+    question: "Can I cancel my order?",
+    answer: "No, currently you cannot cancel your order on Sagoon.",
   },
 ];
 
