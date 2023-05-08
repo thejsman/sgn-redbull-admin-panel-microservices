@@ -1,0 +1,88 @@
+service: admin-occasion-message-service
+useDotenv: true
+frameworkVersion: "3"
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+provider:
+  name: aws
+  runtime: nodejs14.x
+  memorySize: 256
+  stage: ${opt:stage, 'dev'}
+  region: ${self:custom.region.${sls:stage}}
+  environment:
+    LC_OCCASION_MESSAGE_TABLE: ${self:custom.LCOccasionMssageTable}
+  iam:
+    role:
+      statements:
+        - ${file(iam/LCOccasionMessageTableIAM.yml):LCOccasionMessageTableIAM}
+
+resources:
+  Resources:
+    LCOccasionMessageTable: ${file(resources/LCOccasionMessageTable.yml):LCOccasionMessageTable}
+
+functions:
+  AddMessageInOccasion:
+    handler: src/handlers/AddMessageInOccasion.handler
+    events:
+      - http:
+          method: POST
+          path: /addMessage
+          cors: true
+
+  getMessageInOccasion:
+    handler: src/handlers/getMessageInOccasion.handler
+    events:
+      - http:
+          method: GET
+          path: /getMessage
+          cors: true
+
+  deleteMessageInOccasion:
+    handler: src/handlers/deleteMessageInOccasion.handler
+    events:
+      - http:
+          method: POST
+          path: /deleteMessage
+          cors: true
+ 
+custom:
+  LCOccasionMssageTable: "LCOccasionMessageTable-${sls:stage}"
+ 
+  domains:
+    dev: dev.sagoonlite.com
+    testing: testing.sagoon.com
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    dev: eu-central-1
+    testing: ap-southeast-1
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  bucket:
+    dev: sagoon-2022-dev
+    testing: sagoon-staging
+    staging: sagoon-staging
+    prod: sagoon-prod
+
+  accessControlAllowOrigin:
+    dev: "*"
+    testing: "*"
+    staging: "*.sagoon.com"
+    prod: "*"
+
+  dataTransferredFromTo:
+    dev: staging
+    staging: prod
+    prod: staging
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: admin-occasion-message
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge
