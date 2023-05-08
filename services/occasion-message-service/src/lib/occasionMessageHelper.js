@@ -16,12 +16,16 @@ export const putMessageInOccasion = async (messageParams) => {
 export const getMessages = async (messageParams) => {
   const params = {
     TableName: process.env.LC_OCCASION_MESSAGE_TABLE,
-    KeyConditionExpression: "#occasionName = :occasionName",
+    IndexName: "occasionName-isHost-Index",
+    KeyConditionExpression:
+      "#occasionName = :occasionName and #isHost = :isHost",
     ExpressionAttributeNames: {
       "#occasionName": "occasionName",
+      "#isHost": "isHost",
     },
     ExpressionAttributeValues: {
       ":occasionName": messageParams.occasionName,
+      ":isHost": messageParams.isHost,
     },
   };
   try {

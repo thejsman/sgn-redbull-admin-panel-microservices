@@ -3,12 +3,13 @@ import { responseHandler } from "../lib/utils";
 import { putMessageInOccasion } from "../lib/occasionMessageHelper";
 async function AddMessageInOccasion(event, context) {
   let now = new Date();
-  let { displayOrder, occasionName,message } = event.body;
+  let { displayOrder, occasionName, message, isHost } = event.body;
   let messageParams = {
     displayOrder,
     occasionName,
     createdAt: now.toISOString(),
-    message
+    message,
+    isHost,
   };
   try {
     await putMessageInOccasion(messageParams);

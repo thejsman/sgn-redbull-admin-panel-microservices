@@ -4,16 +4,16 @@ import { getMessages } from "../lib/occasionMessageHelper";
 
 async function getMessageInOccasion(event, context) {
   console.log("event body", event);
-  let { occasionName } = event.queryStringParameters;
+  let { occasionName, isHost } = event.queryStringParameters;
   try {
-    let result = await getMessages({ occasionName });
+    let result = await getMessages({ occasionName, isHost });
     return responseHandler({
       statusCode: 200,
       message: "Get Messages",
       data: result.Items,
     });
   } catch (error) {
-    console.log("error",error);
+    console.log("error", error);
     return responseHandler({
       statusCode: 500,
       message: "Error Occur",
