@@ -1,6 +1,8 @@
 import AWS from "aws-sdk";
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 import { generateUpdateQuery } from "../../../../common/lib/utils";
+import { sendIndiaSMS } from "./indiaSms.js";
+import { sendNepalSMS } from "./nepalSms.js";
 
 export const createRewardTransaction = async (payload) => {
   const now = new Date();
@@ -62,5 +64,27 @@ export const updateUserReward = async (userId, payload) => {
     }
   } catch (error) {
     console.log("Exception in updateUserReward", error);
+  }
+};
+
+export const sendSMS = async ({ dialCode, phone, reward }) => {
+  // invitationCode,
+  try {
+    const flowId = "62cec8b74b9314686017b592";
+    let result;
+    console.log('dialCode', dialCode);
+    if (dialCode == "91") {
+      result = await sendIndiaSMS(flowId, `${dialCode}${phone}`, {
+        reward
+      });
+    } else if (dialCode == "977") {
+      result = await sendNepalSMS("REWARD_ADDED", `${dialCode}${phone}`, {
+        reward
+      });
+    }
+    console.log('result', result);
+    return result;
+  } catch (e) {
+    return { message: "could not be send", type: "failed" };
   }
 };

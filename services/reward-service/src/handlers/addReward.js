@@ -1,9 +1,8 @@
 import { commonMiddleware } from "common-middleware-layer";
-import { updateUserReward, createRewardTransaction } from "../lib/utils";
-
+import { updateUserReward, createRewardTransaction, sendSMS } from "../lib/utils";
 async function addRewards(event, context) {
   try {
-    const { userId, amount, description, transactionType } = event.body;
+    const { userId, amount, description, transactionType, dialCode, phone } = event.body;
 
     // console.log({ eventBody: event.body });
     if (!userId || !amount || !description || !transactionType) {
@@ -30,7 +29,14 @@ async function addRewards(event, context) {
       updateUserReward(userId, payload),
     ]);
     console.log("Update result:", result);
-    // "access-control-allow-origin": `${process.env.STAGE}.sagoon.com`,
+    //send sms now
+    if (dialCode && phone) {
+      console.log('sending sms');
+      let smsresult = await sendSMS({ dialCode, phone, reward: amount });
+      console.log('smsresult', smsresult);
+    }
+
+
     return {
       statusCode: 200,
       headers: {
