@@ -9,7 +9,7 @@ provider:
   name: aws
   runtime: nodejs14.x
   memorySize: 256
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'staging'}
   region: ${self:custom.region.${sls:stage}}
 
   environment:
@@ -41,6 +41,13 @@ functions:
           method: PATCH
           path: /update
           cors: true
+  updateVoucherExpiryDate:
+    handler: src/handlers/updateVoucherExpiryDate.handler
+    events:
+      - http:
+          method: PATCH
+          path: /update/tillDate
+          cors: true
   voucherList:
     handler: src/handlers/vouchersList.handler
     events:
@@ -61,6 +68,13 @@ functions:
       - http:
           method: GET
           path: /getById
+          cors: true
+  deleteVoucherByVoucherId:
+    handler: src/handlers/deleteVoucherByVoucherId.handler
+    events:
+      - http:
+          method: DELETE
+          path: /delete
           cors: true
   processPendingVouchers:
     handler: src/handlers/processPendingVouchers.handler
