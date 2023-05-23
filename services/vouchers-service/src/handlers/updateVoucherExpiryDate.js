@@ -9,11 +9,11 @@ const updateVoucherExpiryDate = async (event, context) => {
   try {
     let updateData;
     let dbPromises = [];
-    if (data.vouchers && data.vouchers.length > 0) {
+    if (data.vouchers && data.vouchers.length > 0 && data.validTill) {
       console.log("data,", data);
       data.vouchers.forEach((item, i) => {
         console.log("item,", item);
-        dbPromises.push(updateVoucherValidTill(item));
+        dbPromises.push(updateVoucherValidTill(item, data.validTill));
       });
       console.log("dbPromises,", dbPromises);
       const response = await Promise.allSettled(dbPromises);

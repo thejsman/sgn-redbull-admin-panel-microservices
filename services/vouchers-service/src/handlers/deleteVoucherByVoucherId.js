@@ -13,7 +13,7 @@ const deleteVoucherByVoucherId = async (event, context) => {
         await deleteVoucher(getData.Items[0]);
         return responseHandler({
           statusCode: 200,
-          message: "Voucher has been deleted successfuly ",
+          message: "Voucher has been deleted successfully ",
           data: {},
         });
       } else {

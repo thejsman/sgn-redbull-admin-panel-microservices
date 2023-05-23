@@ -158,11 +158,12 @@ export const deleteVoucher = async (data) => {
   console.log("data", data);
   let params = {
     TableName: process.env.VOUCHER_TABLE_NAME,
-    IndexName: "couponVoucherId-Index",
     Key: {
+      pk: data.pk,
       couponVoucherId: data.couponVoucherId,
     },
   };
+  console.log("deleteVoucher params", params);
   try {
     return await dynamodb.delete(params).promise();
   } catch (error) {
@@ -228,7 +229,7 @@ export const updateVoucherStatus = async (data) => {
   }
 };
 
-export const updateVoucherValidTill = async (data) => {
+export const updateVoucherValidTill = async (data, validTill) => {
   let params = {
     TableName: process.env.VOUCHER_TABLE_NAME,
     Key: {
@@ -239,7 +240,7 @@ export const updateVoucherValidTill = async (data) => {
       "#validTill": "validTill",
     },
     ExpressionAttributeValues: {
-      ":validTill": data.validTill,
+      ":validTill": validTill,
     },
     UpdateExpression: "SET #validTill = :validTill",
     ReturnValues: "ALL_NEW",
