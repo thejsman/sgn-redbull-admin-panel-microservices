@@ -7,8 +7,20 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 var s3 = new AWS.S3();
 async function AddTemplate(event, context) {
   try {
-    let { data, templateName, occasionName } = event.body;
+    let {
+      data,
+      templateName,
+      occasionName,
+      templateTitle = "",
+      templateDescription = "",
+      templateTextColor = "",
+    } = event.body;
     data.templateIdentifier = "occasionTemplate";
+    data.content = {
+      descriptionText: templateDescription,
+      textColor: templateTextColor,
+      titleText: templateTitle,
+    };
     occasionName = occasionName.toLowerCase().trim();
     templateName = templateName.toLowerCase().trim();
     let fileName = data.fileName;
