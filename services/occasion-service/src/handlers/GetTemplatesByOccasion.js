@@ -8,7 +8,7 @@ const dynamoDb = new AWS.DynamoDB.DocumentClient();
 async function GetTemplatesByOccasion(event, context) {
   try {
     const data = event.queryStringParameters;
-    const occasionName = event.pathParameters.templateName;
+    const occasionName = event.pathParameters.templateName.toLowerCase();
     let params = {
       TableName: process.env.OCCASION_TEMPLATES_TABLE,
       Limit: +data.limit,

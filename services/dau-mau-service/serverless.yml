@@ -81,8 +81,7 @@ custom:
 
   authorizer:
     name: VerifyTokenARN
-    arn:
-      Fn::ImportValue: VerifyTokenARN
+    arn: arn:aws:lambda:${aws:region}:${aws:accountId}:function:sgn-custom-authorizer-${sls:stage}-verifyToken
   jwtLayerVersion:
     dev: 8
     staging: 1
