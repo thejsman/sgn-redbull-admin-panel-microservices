@@ -1,0 +1,96 @@
+service: instagram-orders-service
+useDotenv: true
+frameworkVersion: '3'
+
+plugins:
+  - serverless-bundle
+  - serverless-domain-manager
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  memorySize: 1024
+  stage: ${opt:stage, 'staging'}
+  region: ${self:custom.region.${sls:stage}}
+  layers:
+    - arn:aws:lambda:${aws:region}:${aws:accountId}:layer:common-middleware-layer:${self:custom.commonMiddlewareLayerVersion.${sls:stage}}
+
+  environment:
+    REGION: ${self:provider.region}
+    INSTAGRAM_ORDERS_TABLE: InstagramOrdersTable-${sls:stage}
+       
+  iam:
+    role:
+      statements:
+        - ${file(iam/InstagramOrdersTableIAM.yml):InstagramOrdersTableIAM}
+resources:
+  Resources:
+    InstagramOrdersTable: ${file(resources/InstagramOrdersTable.yml):InstagramOrdersTable}
+        
+functions:
+  createOrder:
+    handler: src/handlers/createOrder.handler
+    events:
+      - http:
+          method: post
+          path: /create
+          cors: true
+  getAllOrders:
+    handler: src/handlers/getAllOrders.handler
+    events:
+      - http:
+          method: get
+          path: /getAll
+          cors: true
+  getOrderById:
+    handler: src/handlers/getOrderById.handler
+    events:
+      - http:
+          method: get
+          path: /getById/{transactionId}
+          cors: true
+    # updateOrder:
+    #   handler: src/handlers/updateOrder.handler
+    #   events:
+    #     - http:
+    #         method: put
+    #         path: /update/{id}
+    #         cors: true
+    # deleteOrder:
+    #   handler: src/handlers/deleteOrder.handler
+    #   events:
+    #     - http:
+    #         method: delete
+    #         path: /delete/{id}
+    #         cors: true
+
+
+custom:  
+  commonMiddlewareLayerVersion:
+    staging: 1
+    prod: 1
+
+  domains:
+    
+    staging: staging.sagoon.com
+    prod: prod.sagoon.com
+
+  region:
+    staging: ap-southeast-1
+    prod: ap-south-1
+
+  customDomain:
+    domainName: ${self:custom.domains.${sls:stage}}
+    certificateName: ${self:custom.domains.${sls:stage}}
+    basePath: admin-instagram-orders
+    stage: ${sls:stage}
+    createRoute53Record: true
+    endpointType: edge
+
+    bundle:
+      forceExclude: ["common-middleware-layer"]
+      externalModules:
+        - "@aws-sdk/client-dynamodb"
+        - "@aws-sdk/lib-dynamodb"
+      
+      

@@ -32,7 +32,7 @@ async function AddTemplate(event, context) {
       const base64Data = Buffer.from(data.templateImage.replace(/^data:image\/\w+;base64,/, ''), 'base64');
       var s3Params = {
         Bucket: process.env.OCCASION_ICON_FOLDER,
-        Key: `${fileName[0]}-${uuid()}.${fileName[1]}`,
+        Key: `${fileName[0]}-${uuid()}.${fileName[1]}`.replace(/\W/g, '').toLowerCase(),
         Body: base64Data,
         ContentEncoding: 'base64',
         ContentType: type,
