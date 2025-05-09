@@ -8,35 +8,20 @@ InstagramOrdersTable:
     AttributeDefinitions:
       - AttributeName: dialCode
         AttributeType: S
-      - AttributeName: phone
-        AttributeType: S
       - AttributeName: createdAt
         AttributeType: S
       - AttributeName: createdDate
         AttributeType: S
       - AttributeName: transactionId
         AttributeType: S
-      - AttributeName: transactionStatus
-        AttributeType: S
-      - AttributeName: userId
-        AttributeType: S    
-
+      
     KeySchema:
       - AttributeName: dialCode
         KeyType: HASH
-      - AttributeName: phone
+      - AttributeName: createdAt
         KeyType: RANGE
 
     LocalSecondaryIndexes:
-      - IndexName: DialCode-CreatedAt-index
-        KeySchema:
-          - AttributeName: dialCode
-            KeyType: HASH
-          - AttributeName: createdAt
-            KeyType: RANGE
-        Projection:
-          ProjectionType: ALL
-
       - IndexName: DialCode-CreatedDate-index
         KeySchema:
           - AttributeName: dialCode
@@ -54,20 +39,10 @@ InstagramOrdersTable:
             KeyType: RANGE
         Projection:
           ProjectionType: ALL
-
-      - IndexName: DialCode-TransactionStatus-index
-        KeySchema:
-          - AttributeName: dialCode
-            KeyType: HASH
-          - AttributeName: transactionStatus
-            KeyType: RANGE
-        Projection:
-          ProjectionType: ALL
-
     GlobalSecondaryIndexes:
-      - IndexName: UserId-index
+      - IndexName: TransactionId-index
         KeySchema:
-          - AttributeName: userId
+          - AttributeName: transactionId
             KeyType: HASH
         Projection:
           ProjectionType: ALL

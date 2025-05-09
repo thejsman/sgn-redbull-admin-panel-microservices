@@ -13,7 +13,6 @@ const getAllOrders = async (event, context) => {
         : undefined;
 
     const expression = {
-      IndexName: 'DialCode-CreatedAt-index',
       KeyConditionExpression: 'dialCode = :dialCode',
       ExpressionAttributeValues: {
         ':dialCode': channel,

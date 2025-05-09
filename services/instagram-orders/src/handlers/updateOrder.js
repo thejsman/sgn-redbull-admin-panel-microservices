@@ -1,8 +1,8 @@
-import commonMiddleware from '../../../../packages/common-middleware';
+import commonMiddleware from '../../../../packages/common-middleware/index.js';
 import { queryItems } from '../lib/dynamoDb.manager.js';
-import { responseHandler } from '../lib/response';
+import { responseHandler } from '../lib/response.js';
 
-const getAllOrders = async (event) => {
+const updateOrder = async (event) => {
   try {
     const { transactionId } = event.pathParameters || {};
     const { dialCode = '977' } = event.queryStringParameters || {};
@@ -33,7 +33,7 @@ const getAllOrders = async (event) => {
 
     if (!result.Items || result.Items.length === 0) {
       return responseHandler({
-        statusCode: 404,
+        statusCode: 200,
         message: 'Order not found',
         data: [],
       });
@@ -47,7 +47,7 @@ const getAllOrders = async (event) => {
       },
     });
   } catch (error) {
-    console.error('Error in getAllOrders:', {
+    console.error('Error in updateOrder:', {
       errorMessage: error.message,
       errorStack: error.stack,
     });
@@ -60,4 +60,4 @@ const getAllOrders = async (event) => {
   }
 };
 
-export const handler = commonMiddleware(getAllOrders);
+export const handler = commonMiddleware(updateOrder);

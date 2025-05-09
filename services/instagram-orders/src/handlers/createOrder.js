@@ -7,16 +7,18 @@ const createOrder = async (event, context) => {
   try {
     const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
     console.log('Request Body:', body);
-    const { user, products } = body;
+    const { products, discount = 0, deliveryCharge = 0 } = body;
     // TODO: Add your order creation logic here
     const now = new Date();
     const transactionId = `insta-${Math.random().toString(36).substring(2, 10)}`;
     const item = {
+      dialCode: '977',
       createdAt: now.toISOString(),
       createdDate: now.toISOString().substring(0, 10),
+      deliveryCharge,
       products,
-      ...user,
       transactionId,
+      discount,
       transactionStatus: 'PENDING',
     };
 

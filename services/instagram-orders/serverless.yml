@@ -49,13 +49,13 @@ functions:
           method: get
           path: /getById/{transactionId}
           cors: true
-    # updateOrder:
-    #   handler: src/handlers/updateOrder.handler
-    #   events:
-    #     - http:
-    #         method: put
-    #         path: /update/{id}
-    #         cors: true
+  updateOrder:
+    handler: src/handlers/updateOrder.handler
+    events:
+      - http:
+          method: put
+          path: /update/{id}
+          cors: true
     # deleteOrder:
     #   handler: src/handlers/deleteOrder.handler
     #   events:
